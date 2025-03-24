@@ -18,9 +18,20 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(express.json());
 
 // ✅ Allow frontend to call backend with cookies
+const allowedOrigins = [
+  "https://polygonprojects-1.onrender.com",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
