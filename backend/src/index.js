@@ -12,10 +12,13 @@ const PORT = process.env.PORT || 5001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ✅ Detect environment
+const isProduction = process.env.NODE_ENV === "production";
+
 // ✅ Allowed origins
 const allowedOrigins = [
-  "https://polygonprojects-1.onrender.com",
-  "http://localhost:5173",
+  "https://polygonprojects-1.onrender.com", // Frontend on Render
+  "http://localhost:5173", // Local dev
 ];
 
 // ✅ CORS middleware
@@ -35,35 +38,33 @@ app.use(
 // ✅ JSON parsing
 app.use(express.json());
 
-// ✅ Log origin
+// ✅ Log incoming origins
 app.use((req, res, next) => {
   console.log("Incoming request from:", req.headers.origin);
   next();
 });
 
-// ✅ Session config
-const isProduction = process.env.NODE_ENV === "production";
-
+// ✅ Session setup
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: "your-secret-key", // Replace with env variable in real deployment
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,
-      sameSite: "none",
-      maxAge: 1000 * 60 * 60,
+      secure: true, // Required for HTTPS on Render
+      sameSite: "none", // Required for cross-site cookies
+      maxAge: 1000 * 60 * 60, // 1 hour
       ...(isProduction && {
-        domain: "polygonprojects-1.onrender.com", // ✅ Only in production
+        domain: "polygonprojects.onrender.com", // ✅ Backend domain ONLY
       }),
     },
   })
 );
 
-// ✅ Routes
+// ✅ API Routes
 app.use("/", authRoutes);
 
-// ✅ Start server
+// ✅ Start the server
 app.listen(PORT, () => {
   console.log("server is running on port:", PORT);
 });
