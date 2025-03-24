@@ -6,7 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = 5001;
 
 // ✅ Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);

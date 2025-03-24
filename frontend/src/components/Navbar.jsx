@@ -3,7 +3,7 @@ import "../styles/Navbar.css"; // CSS is applied globally
 
 export default function Navbar({ onLogout }) {
   const handleLogout = async () => {
-    await fetch("http://localhost:5001/api/logout", {
+    await fetch("https://polygonprojects.onrender.com/api/logout", {
       method: "POST",
       credentials: "include",
     });

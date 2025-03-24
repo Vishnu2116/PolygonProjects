@@ -13,7 +13,7 @@ function App() {
   const [authenticated, setAuthenticated] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/check-auth", {
+    fetch("https://polygonprojects.onrender.com/api/check-auth", {
       credentials: "include",
     })
       .then((res) => res.json())
