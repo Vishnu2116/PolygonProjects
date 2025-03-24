@@ -10,6 +10,10 @@ router.get("/api/check-auth", (req, res) => {
     res.json({ authenticated: false });
   }
 });
+router.get("/api/test-session", (req, res) => {
+  req.session.user = { username: "test-user" };
+  res.json({ message: "Session set" });
+});
 
 router.post("/api/login", (req, res) => {
   const { username, password } = req.body; // ✅ Extract from body
