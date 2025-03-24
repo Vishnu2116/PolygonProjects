@@ -6,23 +6,27 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 
-// ✅ Fix __dirname for ES modules
+// ✅ __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ CORS origin from env (Render) or localhost fallback
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-
-app.use(express.json());
-
-// ✅ Allow frontend to call backend with cookies
+// ✅ Allowed origins for CORS
 const allowedOrigins = [
-  "https://polygonprojects-1.onrender.com",
-  "http://localhost:5173",
+  "https://polygonprojects-1.onrender.com", // your frontend on Render
+  "http://localhost:5173", // local dev
 ];
 
+// ✅ Middleware
+app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log("Incoming request from:", req.headers.origin);
+  next();
+});
+
+// ✅ CORS setup
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -36,25 +40,33 @@ app.use(
   })
 );
 
-// ✅ Session config (MemoryStore - safe for MVPs)
+// ✅ Session setup
 app.use(
   session({
-    secret: "your-secret-key", // replace with process.env.SESSION_SECRET in prod
+    secret: "your-secret-key", // Use process.env.SESSION_SECRET in prod
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true, // required for HTTPS (Render)
-      sameSite: "none", // allows cross-origin cookie sharing
+      secure: true,
+      sameSite: "none",
       maxAge: 1000 * 60 * 60, // 1 hour
     },
   })
 );
 
-// ✅ Backend API routes
+// ✅ Auth API routes
 app.use("/", authRoutes);
 
-// ✅ Serve frontend if in production
+// ✅ Serve frontend in production (Vite build)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+  });
+}
+
+// ✅ Start server
 app.listen(PORT, () => {
   console.log("server is running on port:", PORT);
 });
