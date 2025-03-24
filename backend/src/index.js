@@ -8,16 +8,17 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ __dirname for ES Modules
+// ✅ Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Allowed origins for CORS
+// ✅ Allowed origins
 const allowedOrigins = [
-  "https://polygonprojects-1.onrender.com", // frontend on Render
-  "http://localhost:5173", // local dev
+  "https://polygonprojects-1.onrender.com",
+  "http://localhost:5173",
 ];
 
+// ✅ CORS middleware
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -31,43 +32,35 @@ app.use(
   })
 );
 
-// ✅ Middleware
+// ✅ JSON parsing
 app.use(express.json());
 
+// ✅ Log origin
 app.use((req, res, next) => {
   console.log("Incoming request from:", req.headers.origin);
   next();
 });
 
-// ✅ CORS setup
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+// ✅ Session config
+const isProduction = process.env.NODE_ENV === "production";
 
-// ✅ Session setup
 app.use(
   session({
-    secret: "your-secret-key", // Use process.env.SESSION_SECRET in prod
+    secret: "your-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: true,
       sameSite: "none",
-      maxAge: 1000 * 60 * 60, // 1 hour
+      maxAge: 1000 * 60 * 60,
+      ...(isProduction && {
+        domain: "polygonprojects-1.onrender.com", // ✅ Only in production
+      }),
     },
   })
 );
 
-// ✅ Auth API routes
+// ✅ Routes
 app.use("/", authRoutes);
 
 // ✅ Start server
