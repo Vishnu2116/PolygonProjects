@@ -1,7 +1,8 @@
-import React from "react";
-import "../styles/LoginPageCss.css"; // CSS is applied globally
+import React, { useState } from "react";
+import "../styles/LoginPageCss.css";
 import { toast, ToastContainer } from "react-toastify";
-import { useState } from "react";
+
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
 export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -10,31 +11,39 @@ export default function LoginPage({ onLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("https://polygonprojects.onrender.com/api/login", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (res.ok) {
-      toast.success("Login successful!", {
+      if (res.ok) {
+        toast.success("Login successful!", {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "light",
+        });
+        onLogin();
+      } else {
+        toast.error("Invalid username or password", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          theme: "colored",
+        });
+        setUsername("");
+        setPassword("");
+      }
+    } catch (error) {
+      toast.error("Network error", {
         position: "top-right",
         autoClose: 3000,
-        theme: "light",
+        theme: "dark",
       });
-      onLogin();
-    } else {
-      toast.error("Invalid username or password", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        theme: "colored",
-      });
-      setUsername("");
-      setPassword("");
     }
   };
 
@@ -45,7 +54,7 @@ export default function LoginPage({ onLogin }) {
       </div>
       <div className="right">
         <div className="title">
-          <h1>Land Information Project </h1>
+          <h1>Land Information Project</h1>
         </div>
         <form onSubmit={handleSubmit} autoComplete="off" align="center">
           <div className="formuptext">
@@ -69,8 +78,7 @@ export default function LoginPage({ onLogin }) {
             autoComplete="new-password"
             onChange={(e) => setPassword(e.target.value)}
           />
-
-          <button type="submit"> Sign In</button>
+          <button type="submit">Sign In</button>
         </form>
         <ToastContainer />
       </div>

@@ -5,11 +5,12 @@ import RightLayer from "../components/RightLayer";
 import RecordDetails from "../components/Records/RecordDetails";
 import "../styles/HomePage.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
+
 export default function HomePage({ onLogout }) {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [isPOISectionVisible, setIsPOISectionVisible] = useState(true);
 
-  // ✅ Moved POI settings here to share across MapView & RightLayer
   const [poiSettings, setPoiSettings] = useState({
     district: false,
     mandal: false,
@@ -27,7 +28,7 @@ export default function HomePage({ onLogout }) {
   });
 
   const handleLogout = async () => {
-    await fetch("https://polygonprojects.onrender.com/api/logout", {
+    await fetch(`${API_BASE}/api/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -49,7 +50,6 @@ export default function HomePage({ onLogout }) {
           poiSettings={poiSettings}
           isPOISectionVisible={isPOISectionVisible}
         />
-
         <RightLayer
           settings={poiSettings}
           setSettings={setPoiSettings}

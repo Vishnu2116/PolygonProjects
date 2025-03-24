@@ -14,9 +14,22 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Allowed origins for CORS
 const allowedOrigins = [
-  "https://polygonprojects-1.onrender.com", // your frontend on Render
+  "https://polygonprojects-1.onrender.com", // frontend on Render
   "http://localhost:5173", // local dev
 ];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // ✅ Middleware
 app.use(express.json());
@@ -56,15 +69,6 @@ app.use(
 
 // ✅ Auth API routes
 app.use("/", authRoutes);
-
-// ✅ Serve frontend in production (Vite build)
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-  });
-}
 
 // ✅ Start server
 app.listen(PORT, () => {

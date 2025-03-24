@@ -1,14 +1,17 @@
 import emblemlogo from "../assets/emblemLogo.svg";
 import "../styles/Navbar.css"; // CSS is applied globally
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
+
 export default function Navbar({ onLogout }) {
   const handleLogout = async () => {
-    await fetch("https://polygonprojects.onrender.com/api/logout", {
+    await fetch(`${API_BASE}/api/logout`, {
       method: "POST",
       credentials: "include",
     });
     onLogout();
   };
+
   return (
     <nav className="navbar">
       <div className="navdiv">
