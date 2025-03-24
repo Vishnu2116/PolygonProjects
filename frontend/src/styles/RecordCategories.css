@@ -1,0 +1,78 @@
+/* Reduce overall size */
+.categories-container {
+    width: 120px; /* Smaller width */
+    position: absolute;
+    left: -5px; /* Bring it closer */
+    top: 35px; /* Adjust position */
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+/* Compact header */
+.categories-header {
+    padding: 3px 6px; /* Reduced padding */
+    border-bottom: 1px solid #e9ecef;
+}
+
+.categories-header h3 {
+    margin: 0;
+    font-size: 10px; /* Smaller font */
+}
+
+/* Smaller record category items */
+.record-category-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0px; /* Remove extra gap */
+}
+
+/* Compact record header */
+.record-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 5px; /* Reduced padding */
+    font-size: 10px; /* Smaller font */
+}
+
+/* Smaller icons */
+.record-icon {
+    display: inline-flex;
+    margin-right: 2px; /* Reduce spacing */
+}
+
+.record-icon-title {
+    display: flex;
+    align-items: center;
+}
+
+/* Smaller expand icon */
+.expand-icon {
+    font-size: 9px;
+}
+
+/* Compact details */
+.record-details {
+    margin-top: 0px;
+    padding: 3px;
+    width: 100%;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea;
+}
+
+/* Smaller fields */
+.record-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    font-size: 9px; /* Smaller font */
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.field-label {
+    font-weight: 500;
+    color: #6c757d;
+}

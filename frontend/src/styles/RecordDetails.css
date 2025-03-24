@@ -1,0 +1,258 @@
+.records-sidebar {
+    position: fixed;
+    left: 20px;
+    top: 80px;
+    width: 300px;
+    background-color: transparent;
+    z-index: 1000;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 120px);
+  }
+  
+  .records-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    margin-right: 8px;
+    color: #333;
+  }
+  
+  .back-button:hover {
+    color: #333;
+    background-color: transparent;
+  }
+  
+  .location-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #fff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1px;
+    position: sticky;
+    top: calc(16px + 49px); /* Height of header + margin */
+    z-index: 1;
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    color: #0086c3;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    color: #0086c3;
+  }
+  
+  .manage-button {
+    background: none;
+    border: none;
+    color: #037a51;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+  
+  .manage-button:hover {
+    color: #037a51;
+    background-color: transparent;
+  }
+  
+  .records-content {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 220px); /* Adjusted to account for headers */
+    overflow: hidden;
+  }
+  
+  .records-list {
+    overflow-y: auto;
+    background-color: #fff;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-grow: 1;
+    max-height: 100%;
+  }
+  
+  .records-list::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .record-item {
+    display: flex;
+    padding: 8px 16px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  
+  .record-item:nth-child(even) {
+    background-color: #f5f5f5;
+  }
+  
+  .record-item:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  
+  .item-label {
+    width: 40%;
+    color: #666;
+    font-size: 13px;
+  }
+  
+  .item-value {
+    width: 60%;
+    font-size: 13px;
+    color: #333;
+    word-break: break-word;
+  }
+  
+  /* HomePage.css adjustments */
+  .map-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 60px);
+  }
+
+  /* Add these styles to your RecordDetails.css file */
+
+/* Container for the categories component */
+.categories-container-wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-height: 80vh;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  z-index: 1500;
+  overflow-y: auto;
+}
+
+/* Styling for RecordCategories */
+.categories-container {
+  width: 100%;
+}
+
+.categories-header {
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.categories-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Styles for record items in categories */
+.categories-container .record-item {
+  border-bottom: 1px solid #e5e5e5;
+  background-color: white;
+}
+
+.categories-container .record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.categories-container .record-header:hover {
+  background-color: #f9f9f9;
+}
+
+.categories-container .record-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.categories-container .record-details {
+  padding: 0 16px 12px;
+  background-color: #f9f9f9;
+}
+
+.categories-container .record-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.categories-container .record-field:last-child {
+  border-bottom: none;
+}
+
+.categories-container .field-label {
+  color: #666;
+  font-size: 13px;
+}
+
+.categories-container .field-value {
+  font-size: 13px;
+  color: #333;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.manage-button-container {
+  position: relative;
+  margin: 0; /* Remove unnecessary margin */
+  padding: 0; /* Remove extra padding */
+}
+
+
+/* Media queries for responsiveness */
+/* @media (max-width: 400px) {
+  .categories-container-wrapper {
+    width: 50%;
+    max-width: 200px;
+  }
+} */
+
