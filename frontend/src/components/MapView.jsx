@@ -247,9 +247,9 @@ export default function MapView({
         map.current.setLayoutProperty(id, "visibility", visible);
     });
 
-    // Always show district labels
     if (map.current.getLayer("districts-label")) {
-      map.current.setLayoutProperty("districts-label", "visibility", "visible");
+      const visible = poiSettings["district"] ? "visible" : "none";
+      map.current.setLayoutProperty("districts-label", "visibility", visible);
     }
   }, [poiSettings, isPOISectionVisible]);
 
