@@ -14,7 +14,7 @@ router.post("/api/login", (req, res) => {
 
   if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "10h" });
 
   res.json({ token });
 });

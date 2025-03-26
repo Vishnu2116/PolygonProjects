@@ -42,30 +42,41 @@ export default function LoginPage({ onLogin }) {
         <div className="title">
           <h1>Land Information Project</h1>
         </div>
-        <form onSubmit={handleSubmit} autoComplete="off" align="center">
+        <form
+          onSubmit={handleSubmit}
+          autoComplete="on"
+          method="post"
+          align="center"
+        >
           <div className="formuptext">
             <br />
             <h1>Sign In</h1>
             <h5>Log in to your secure account</h5>
           </div>
+
           <label htmlFor="username">Username</label>
           <input
             type="text"
             id="username"
+            name="username"
             value={username}
-            autoComplete="off"
+            autoComplete="username"
             onChange={(e) => setUsername(e.target.value)}
           />
+
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
+            name="password"
             value={password}
-            autoComplete="new-password"
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
           />
+
           <button type="submit">Sign In</button>
         </form>
+
         <ToastContainer />
       </div>
     </div>
