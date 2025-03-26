@@ -1,9 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "../styles/MapView.css";
 import geojson from "../assets/tadgeojson";
-import districts from "../assets/District.js";
-import mandalsData from "../assets/Mandal.js";
 
 // POIs
 import anganwadi from "../assets/AngawadiCenters.js";
@@ -20,6 +18,8 @@ export default function MapView({
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const [districts, setDistricts] = useState(null);
+  const [mandals, setMandals] = useState(null);
 
   const POI_LAYERS = [
     {
@@ -32,8 +32,26 @@ export default function MapView({
     { id: "poi-forest", data: forest, setting: "forest", color: "#006400" },
   ];
 
+  // ✅ Load districts and mandals from public folder
   useEffect(() => {
-    if (map.current) return;
+    const loadGeoJSON = async () => {
+      try {
+        const districtRes = await fetch("/District.json");
+        const mandalRes = await fetch("/Mandal.json");
+        const districtData = await districtRes.json();
+        const mandalData = await mandalRes.json();
+        setDistricts(districtData);
+        setMandals(mandalData);
+      } catch (error) {
+        console.error("Error loading GeoJSON:", error);
+      }
+    };
+    loadGeoJSON();
+  }, []);
+
+  // ✅ Initialize map
+  useEffect(() => {
+    if (!districts || !mandals || map.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -45,7 +63,6 @@ export default function MapView({
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on("load", () => {
-      // ✅ Parcels
       map.current.addSource("parcels", { type: "geojson", data: geojson });
       map.current.addLayer({
         id: "parcels-fill",
@@ -67,7 +84,6 @@ export default function MapView({
           "text-field": ["get", "Parcel_num"],
           "text-size": 12,
           "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-          "text-allow-overlap": false,
         },
         paint: {
           "text-color": "#111",
@@ -81,14 +97,6 @@ export default function MapView({
         onSelectPolygon(feature.properties);
       });
 
-      map.current.on("mouseenter", "parcels-fill", () => {
-        map.current.getCanvas().style.cursor = "pointer";
-      });
-      map.current.on("mouseleave", "parcels-fill", () => {
-        map.current.getCanvas().style.cursor = "";
-      });
-
-      // ✅ Fit map to Andhra bounds
       const bounds = new mapboxgl.LngLatBounds();
       districts.features.forEach((feature) => {
         const coords = feature.geometry.coordinates;
@@ -98,7 +106,7 @@ export default function MapView({
       });
       map.current.fitBounds(bounds, { padding: 20 });
 
-      // ✅ District Layers
+      // ✅ Districts
       map.current.addSource("districts", { type: "geojson", data: districts });
       map.current.addLayer({
         id: "districts-fill",
@@ -123,7 +131,7 @@ export default function MapView({
           "text-size": 14,
           "text-font": ["Open Sans Bold"],
           "text-anchor": "center",
-          visibility: "none",
+          visibility: "none", // Always visible
         },
         paint: {
           "text-color": "#004466",
@@ -132,8 +140,8 @@ export default function MapView({
         },
       });
 
-      // ✅ Mandals Layers
-      map.current.addSource("mandals", { type: "geojson", data: mandalsData });
+      // ✅ Mandals
+      map.current.addSource("mandals", { type: "geojson", data: mandals });
       map.current.addLayer({
         id: "mandals-fill",
         type: "fill",
@@ -210,12 +218,12 @@ export default function MapView({
         }
       });
     });
-  }, []);
+  }, [districts, mandals]);
 
+  // ✅ Toggle visibility
   useEffect(() => {
     if (!map.current || !poiSettings) return;
 
-    // POIs
     POI_LAYERS.forEach(({ id, setting }) => {
       const visible =
         isPOISectionVisible && poiSettings[setting] ? "visible" : "none";
@@ -225,27 +233,24 @@ export default function MapView({
         map.current.setLayoutProperty(`${id}-outline`, "visibility", visible);
     });
 
-    // ✅ District Layers
+    // District toggles
     ["districts-fill", "districts-outline"].forEach((id) => {
       const visible = poiSettings["district"] ? "visible" : "none";
-      if (map.current.getLayer(id)) {
+      if (map.current.getLayer(id))
         map.current.setLayoutProperty(id, "visibility", visible);
-      }
     });
 
-    // ✅ Always show district labels for clarity
+    // Mandal toggles
+    ["mandals-fill", "mandals-outline", "mandals-label"].forEach((id) => {
+      const visible = poiSettings["mandal"] ? "visible" : "none";
+      if (map.current.getLayer(id))
+        map.current.setLayoutProperty(id, "visibility", visible);
+    });
+
+    // Always show district labels
     if (map.current.getLayer("districts-label")) {
       map.current.setLayoutProperty("districts-label", "visibility", "visible");
     }
-
-    // ✅ Mandals
-    const mandalLayers = ["mandals-fill", "mandals-outline", "mandals-label"];
-    mandalLayers.forEach((id) => {
-      const visible = poiSettings["mandal"] ? "visible" : "none";
-      if (map.current.getLayer(id)) {
-        map.current.setLayoutProperty(id, "visibility", visible);
-      }
-    });
   }, [poiSettings, isPOISectionVisible]);
 
   return <div ref={mapContainer} className="map-container" />;
