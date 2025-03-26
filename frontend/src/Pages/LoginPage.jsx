@@ -14,36 +14,22 @@ export default function LoginPage({ onLogin }) {
     try {
       const res = await fetch(`${API_BASE}/api/login`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
       if (res.ok) {
-        toast.success("Login successful!", {
-          position: "top-right",
-          autoClose: 3000,
-          theme: "light",
-        });
+        const data = await res.json();
+        localStorage.setItem("token", data.token); // ✅ Store token
+        toast.success("Login successful!");
         onLogin();
       } else {
-        toast.error("Invalid username or password", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          theme: "colored",
-        });
+        toast.error("Invalid username or password");
         setUsername("");
         setPassword("");
       }
-    } catch (error) {
-      toast.error("Network error", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "dark",
-      });
+    } catch (err) {
+      toast.error("Network error");
     }
   };
 

@@ -8,25 +8,26 @@ import { useEffect, useState } from "react";
 import LoginPage from "./Pages/LoginPage";
 import HomePage from "./Pages/HomePage";
 
-// ✅ Use environment variable for backend API base
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthenticated(false);
+      return;
+    }
+
     fetch(`${API_BASE}/api/check-auth`, {
-      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to check auth");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => setAuthenticated(data.authenticated))
-      .catch((err) => {
-        console.error("Auth check error:", err);
-        setAuthenticated(false); // fallback to login screen
-      });
+      .catch(() => setAuthenticated(false));
   }, []);
 
   if (authenticated === null) return <p>Loading...</p>;

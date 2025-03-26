@@ -1,14 +1,9 @@
 import emblemlogo from "../assets/emblemLogo.svg";
-import "../styles/Navbar.css"; // CSS is applied globally
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
+import "../styles/Navbar.css";
 
 export default function Navbar({ onLogout }) {
-  const handleLogout = async () => {
-    await fetch(`${API_BASE}/api/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // ✅ Clear token
     onLogout();
   };
 
@@ -16,7 +11,7 @@ export default function Navbar({ onLogout }) {
     <nav className="navbar">
       <div className="navdiv">
         <div className="APlogo">
-          <img src={emblemlogo} alt="" />
+          <img src={emblemlogo} alt="Emblem" />
         </div>
         <div className="andr">
           <h1>Land Information System</h1>
