@@ -107,42 +107,7 @@
   min-width: 38px;
 }
 
-/* Animation for toggle group */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.toggle-group {
-  animation: slideDown 0.2s ease-out forwards;
-}
-
-/* Custom scrollbar */
-.layers-panel::-webkit-scrollbar {
-  width: 6px;
-}
-
-.layers-panel::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.layers-panel::-webkit-scrollbar-thumb {
-  background-color: #cbd5e0;
-  border-radius: 3px;
-}
-
-.layers-panel::-webkit-scrollbar-thumb:hover {
-  background-color: #a0aec0;
-}
-
-/* ... Previous CSS remains the same ... */
-
+/* Dropdown search input */
 .search-section {
   margin-bottom: 20px;
   padding: 0 16px;
@@ -151,122 +116,63 @@
 .search-container {
   position: relative;
   width: 100%;
+  margin-bottom: 16px;
 }
 
 .search-input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
-  color: #4a5568;
+  color: #2d3748;
   outline: none;
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding-right: 36px;
 }
 
 .search-input:focus {
   border-color: #3182ce;
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
-.district-dropdown {
+.clear-button {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #718096;
+  z-index: 3;
+  padding: 0;
+  line-height: 1;
+}
+
+.dropdown-wrapper {
   position: absolute;
   top: 100%;
   left: 0;
   width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
   background: white;
   border: 1px solid #e2e8f0;
   border-top: none;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.district-dropdown-item {
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.district-dropdown-item:hover {
-  background-color: #f7fafc;
-}
-
-.district-dropdown-item:active {
-  background-color: #e2e8f0;
-}
-
-/* Customize scrollbar for dropdown */
-.district-dropdown::-webkit-scrollbar {
-  width: 6px;
-}
-
-.district-dropdown::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.district-dropdown::-webkit-scrollbar-thumb {
-  background-color: #cbd5e0;
-  border-radius: 3px;
-}
-
-.district-dropdown::-webkit-scrollbar-thumb:hover {
-  background-color: #a0aec0;
-}
-
-/* Existing CSS remains the same */
-
-.no-results {
-  padding: 10px;
-  text-align: center;
-  color: #718096;
-  background-color: #f7fafc;
-  border-radius: 0 0 8px 8px;
-}
-
-.selected-district {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #e6f2ff;
-  border-radius: 8px;
-  color: #2c5282;
-  font-size: 14px;
-}
-
-.search-container {
-  position: relative;
-  width: 100%;
-}
-
-.district-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  max-height: 250px;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  z-index: 20;
-  padding: 4px 0;
-  transition: all 0.3s ease;
+  z-index: 30;
+  overflow: hidden;
 }
 
 .district-dropdown-item {
   padding: 10px 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  color: #2d3748;
   font-size: 14px;
+  color: #2d3748;
+  transition: all 0.2s ease;
 }
 
 .district-dropdown-item:hover {
@@ -287,114 +193,30 @@
   font-style: italic;
 }
 
-/* Custom scrollbar for dropdown */
+/* Scrollbar for dropdowns */
 .district-dropdown::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
-
-.district-dropdown::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
 .district-dropdown::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 10px;
-  transition: background 0.3s ease;
+  background-color: #cbd5e0;
+  border-radius: 3px;
 }
-
 .district-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+  background-color: #a0aec0;
 }
 
-/* Search input enhancement */
-.search-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #2d3748;
-  outline: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.search-input:focus {
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
-}
-
-/* Selected district styling */
-.selected-district {
-  margin-top: 12px;
-  padding: 12px;
-  background-color: #e6f2ff;
-  border-radius: 8px;
-  color: #2c5282;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.3s ease;
-}
-
-.selected-district strong {
-  margin-right: 8px;
-}
-
-/* Existing styles remain the same */
-
-.mandal-district-info {
-  margin-left: 8px;
-  color: #718096;
-  font-size: 12px;
-}
-
-/* Ensure the search containers can be distinguished */
-.search-container.district-search,
-.search-container.mandal-search {
-  position: relative;
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-/* Existing styles remain the same */
-
-.mandal-search-error {
-  margin-top: 8px;
-  padding: 10px;
-  background-color: #fef3f2;
-  border: 1px solid #fecdca;
-  color: #7a2d20;
-  border-radius: 8px;
-  font-size: 14px;
-  text-align: center;
-}
-
-/* Disable styling for mandal input when no district is selected */
-.search-input:disabled {
-  background-color: #f1f5f9;
-  color: #94a3b8;
-  cursor: not-allowed;
-  border-color: #cbd5e1;
-}
-/* Existing styles like .search-input, .district-dropdown, etc. remain the same */
-
-.mandal-dropdown-content {
-  display: flex;
-  flex-direction: column;
-}
-
+/* Mandal dropdown details */
 .mandal-name {
   font-size: 14px;
   color: #2d3748;
 }
-
 .mandal-district-info {
   font-size: 12px;
   color: #718096;
+  margin-left: 8px;
 }
 
+/* Selected info */
 .selected-location {
   position: absolute;
   top: 16px;
@@ -405,40 +227,32 @@
   font-size: 12px;
   color: #2c5282;
   max-width: 200px;
-  text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-.clear-button {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  color: #718096;
-  padding: 0;
-  z-index: 3; /* higher than dropdown */
-  line-height: 1;
-}
 
-.dropdown-wrapper {
-  position: absolute;
-  top: 100%;
-  left: 0;
+/* LULC styles */
+.lulc-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  background: white; /* ensures dropdown is visible */
-  border: 1px solid #e2e8f0;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  z-index: 30; /* must be higher than the input/clear button */
-  overflow: hidden;
+  padding: 4px 0;
+  gap: 12px;
 }
 
-.search-input {
-  padding-right: 36px; /* avoid overlap with clear button */
+.lulc-color-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  margin-left: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.lulc-color-box:hover {
+  transform: scale(1.1);
 }

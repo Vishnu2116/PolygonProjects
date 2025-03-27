@@ -10,27 +10,22 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 export default function HomePage({ onLogout }) {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [isPOISectionVisible, setIsPOISectionVisible] = useState(false);
+  const [isLULCSectionVisible, setIsLULCSectionVisible] = useState(false);
   const [districts, setDistricts] = useState(null);
   const [mandals, setMandals] = useState(null);
   const [villages, setVillages] = useState(null);
-  const [highlightVillage, setHighLightVillage] = useState(null);
   const [highlightDistrict, setHighlightDistrict] = useState(null);
   const [highlightMandal, setHighlightMandal] = useState(null);
+  const [highlightVillage, setHighlightVillage] = useState(null);
+  const [lulcToggles, setLulcToggles] = useState({});
 
   const [poiSettings, setPoiSettings] = useState({
     district: false,
     mandal: false,
     village: false,
-    revenue: false,
-    enjoyment: false,
-    landClass: false,
-    boundaryPoints: false,
-    heatmap: false,
     anganwadi: false,
     canal: false,
     forest: false,
-    hospital: false,
-    muncipality: false,
   });
 
   const handleLogout = async () => {
@@ -44,18 +39,21 @@ export default function HomePage({ onLogout }) {
   useEffect(() => {
     const loadGeoJSON = async () => {
       try {
-        const districtRes = await fetch("/District.json");
-        const mandalRes = await fetch("/Mandal.json");
-        const VillageRes = await fetch("/Village.json");
-        const districtData = await districtRes.json();
-        const mandalData = await mandalRes.json();
-        const villageData = await VillageRes.json();
-
+        const [d, m, v] = await Promise.all([
+          fetch("/District.json"),
+          fetch("/Mandal.json"),
+          fetch("/Village.json"),
+        ]);
+        const [districtData, mandalData, villageData] = await Promise.all([
+          d.json(),
+          m.json(),
+          v.json(),
+        ]);
         setDistricts(districtData);
         setMandals(mandalData);
         setVillages(villageData);
-      } catch (error) {
-        console.error("Error loading GeoJSON:", error);
+      } catch (err) {
+        console.error("GeoJSON loading failed:", err);
       }
     };
     loadGeoJSON();
@@ -75,12 +73,14 @@ export default function HomePage({ onLogout }) {
           onSelectPolygon={(props) => setSelectedFeature(props)}
           poiSettings={poiSettings}
           isPOISectionVisible={isPOISectionVisible}
+          isLULCSectionVisible={isLULCSectionVisible}
           districts={districts}
           mandals={mandals}
           villages={villages}
-          highlightVillage={highlightVillage}
           highlightDistrict={highlightDistrict}
           highlightMandal={highlightMandal}
+          highlightVillage={highlightVillage}
+          lulcToggles={lulcToggles}
         />
         <RightLayer
           settings={poiSettings}
@@ -89,9 +89,13 @@ export default function HomePage({ onLogout }) {
           setIsPOISectionVisible={setIsPOISectionVisible}
           districts={districts}
           mandals={mandals}
-          onHighlightVillage={setHighLightVillage}
-          onHighlightDistrict={setHighlightDistrict} // ✅ Fixed
-          onHighlightMandal={setHighlightMandal} // ✅ Fixed
+          onHighlightDistrict={setHighlightDistrict}
+          onHighlightMandal={setHighlightMandal}
+          onHighlightVillage={setHighlightVillage}
+          lulcToggles={lulcToggles}
+          setLulcToggles={setLulcToggles}
+          isLULCSectionVisible={isLULCSectionVisible}
+          setIsLULCSectionVisible={setIsLULCSectionVisible}
         />
       </div>
     </div>

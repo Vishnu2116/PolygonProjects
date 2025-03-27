@@ -1,6 +1,22 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import { FixedSizeList as List } from "react-window";
+import LULC from "../assets/LULC";
 import "../styles/RightLayer.css";
+
+const LULC_COLORS = {
+  "Agriculture Land": "#4CAF50",
+  Forest: "#2E7D32",
+  "Water Body": "#1E88E5",
+  "Built Up": "#8E24AA",
+  Wastelands: "#6D4C41",
+  others: "#757575",
+};
 
 export default function RightLayer({
   settings,
@@ -9,10 +25,13 @@ export default function RightLayer({
   setIsPOISectionVisible,
   districts,
   mandals,
-  villages,
-  onHighlightVillage,
   onHighlightDistrict,
   onHighlightMandal,
+  onHighlightVillage,
+  lulcToggles,
+  setLulcToggles,
+  isLULCSectionVisible,
+  setIsLULCSectionVisible,
 }) {
   const [districtSearchTerm, setDistrictSearchTerm] = useState("");
   const [mandalSearchTerm, setMandalSearchTerm] = useState("");
@@ -20,6 +39,29 @@ export default function RightLayer({
   const [selectedMandal, setSelectedMandal] = useState("");
   const [isDistrictDropdownOpen, setIsDistrictDropdownOpen] = useState(false);
   const [isMandalDropdownOpen, setIsMandalDropdownOpen] = useState(false);
+
+  const districtDropdownRef = useRef(null);
+  const mandalDropdownRef = useRef(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        districtDropdownRef.current &&
+        !districtDropdownRef.current.contains(e.target)
+      ) {
+        setIsDistrictDropdownOpen(false);
+      }
+      if (
+        mandalDropdownRef.current &&
+        !mandalDropdownRef.current.contains(e.target)
+      ) {
+        setIsMandalDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const normalize = (str) => str.toLowerCase().replace(/\s+/g, " ").trim();
 
@@ -64,26 +106,37 @@ export default function RightLayer({
       }));
   }, [mandalSearchTerm, selectedDistrict, mandalList]);
 
-  useEffect(() => {
-    const closeDropdowns = (e) => {
-      const containers = document.querySelectorAll(".search-container");
-      containers.forEach((c) => {
-        if (!c.contains(e.target)) {
-          if (c.classList.contains("district-search"))
-            setIsDistrictDropdownOpen(false);
-          if (c.classList.contains("mandal-search"))
-            setIsMandalDropdownOpen(false);
-        }
-      });
-    };
-    document.addEventListener("mousedown", closeDropdowns);
-    return () => document.removeEventListener("mousedown", closeDropdowns);
+  const lulcCategories = useMemo(() => {
+    return [
+      ...new Set(
+        LULC.features.map((f) => f.properties?.LULC_1).filter(Boolean)
+      ),
+    ].sort((a, b) => {
+      if (a.toLowerCase() === "others") return 1;
+      if (b.toLowerCase() === "others") return -1;
+      return a.localeCompare(b);
+    });
   }, []);
+
+  useEffect(() => {
+    const initialToggles = lulcCategories.reduce((acc, category) => {
+      acc[category] = false;
+      return acc;
+    }, {});
+    setLulcToggles(initialToggles);
+  }, [lulcCategories]);
 
   const toggleSetting = useCallback(
     (key) => setSettings((prev) => ({ ...prev, [key]: !prev[key] })),
     [setSettings]
   );
+
+  const toggleLULCCategory = useCallback((category) => {
+    setLulcToggles((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  }, []);
 
   const handleDistrictSelect = (district) => {
     setSelectedDistrict(district);
@@ -105,7 +158,7 @@ export default function RightLayer({
   };
 
   const renderToggle = (label, key) => (
-    <div className="toggle-container">
+    <div className="toggle-container" key={key}>
       <button
         className={`toggle ${settings[key] ? "toggle-active" : ""}`}
         onClick={() => toggleSetting(key)}
@@ -115,6 +168,24 @@ export default function RightLayer({
         <span className="toggle-thumb"></span>
       </button>
       <span className="toggle-label">{label}</span>
+    </div>
+  );
+
+  const renderLULCToggle = (category) => (
+    <div className="toggle-container lulc-toggle-container" key={category}>
+      <button
+        className={`toggle ${lulcToggles[category] ? "toggle-active" : ""}`}
+        onClick={() => toggleLULCCategory(category)}
+        aria-checked={lulcToggles[category]}
+        role="switch"
+      >
+        <span className="toggle-thumb"></span>
+      </button>
+      <span className="toggle-label">{category}</span>
+      <div
+        className="lulc-color-box"
+        style={{ backgroundColor: LULC_COLORS[category] || "#ccc" }}
+      ></div>
     </div>
   );
 
@@ -132,23 +203,25 @@ export default function RightLayer({
 
       <div className="section search-section">
         <h4 className="section-title">District Search</h4>
-        <div className="search-container district-search">
+        <div
+          className="search-container district-search"
+          ref={districtDropdownRef}
+        >
           <input
             type="text"
-            placeholder="Search Districts"
             className="search-input"
+            placeholder="Search Districts"
             value={districtSearchTerm}
             onChange={(e) => {
-              const value = e.target.value;
-              setDistrictSearchTerm(value);
-              if (value.trim() === "") {
+              const val = e.target.value;
+              setDistrictSearchTerm(val);
+              if (val.trim() === "") {
                 setSelectedDistrict("");
                 if (onHighlightDistrict) onHighlightDistrict("");
               }
             }}
             onFocus={() => setIsDistrictDropdownOpen(true)}
           />
-
           {districtSearchTerm && (
             <button
               className="clear-button"
@@ -157,17 +230,16 @@ export default function RightLayer({
                 setSelectedDistrict("");
                 setMandalSearchTerm("");
                 setSelectedMandal("");
-                if (onHighlightDistrict) onHighlightDistrict("");
-                if (onHighlightMandal) onHighlightMandal("");
+                onHighlightDistrict("");
+                onHighlightMandal("");
               }}
             >
               ✕
             </button>
           )}
-
           {isDistrictDropdownOpen && (
             <div className="dropdown-wrapper">
-              {filteredDistricts.length > 0 ? (
+              {filteredDistricts.length ? (
                 <List
                   height={200}
                   itemCount={filteredDistricts.length}
@@ -198,39 +270,37 @@ export default function RightLayer({
 
       <div className="section search-section">
         <h4 className="section-title">Mandal Search</h4>
-        <div className="search-container mandal-search">
+        <div className="search-container mandal-search" ref={mandalDropdownRef}>
           <input
             type="text"
-            placeholder="Search Mandals"
             className="search-input"
+            placeholder="Search Mandals"
             value={mandalSearchTerm}
             onChange={(e) => {
-              const value = e.target.value;
-              setMandalSearchTerm(value);
-              if (value.trim() === "") {
+              const val = e.target.value;
+              setMandalSearchTerm(val);
+              if (val.trim() === "") {
                 setSelectedMandal("");
-                if (onHighlightMandal) onHighlightMandal("");
+                onHighlightMandal("");
               }
             }}
             onFocus={() => setIsMandalDropdownOpen(true)}
           />
-
           {mandalSearchTerm && (
             <button
               className="clear-button"
               onClick={() => {
                 setMandalSearchTerm("");
                 setSelectedMandal("");
-                if (onHighlightMandal) onHighlightMandal("");
+                onHighlightMandal("");
               }}
             >
               ✕
             </button>
           )}
-
           {isMandalDropdownOpen && (
             <div className="dropdown-wrapper">
-              {filteredMandals.length > 0 ? (
+              {filteredMandals.length ? (
                 <List
                   height={200}
                   itemCount={filteredMandals.length}
@@ -285,12 +355,32 @@ export default function RightLayer({
             <span className="toggle-thumb"></span>
           </button>
         </div>
-
         {isPOISectionVisible && (
           <div className="toggle-group">
             {renderToggle("Anganwadi Centers", "anganwadi")}
             {renderToggle("Canal", "canal")}
             {renderToggle("Forest", "forest")}
+          </div>
+        )}
+      </div>
+
+      <div className="section">
+        <div className="section-header">
+          <h4 className="section-title">LULC</h4>
+          <button
+            className={`toggle section-toggle ${
+              isLULCSectionVisible ? "toggle-active" : ""
+            }`}
+            onClick={() => setIsLULCSectionVisible((prev) => !prev)}
+            aria-checked={isLULCSectionVisible}
+            role="switch"
+          >
+            <span className="toggle-thumb"></span>
+          </button>
+        </div>
+        {isLULCSectionVisible && (
+          <div className="toggle-group">
+            {lulcCategories.map((cat) => renderLULCToggle(cat))}
           </div>
         )}
       </div>
