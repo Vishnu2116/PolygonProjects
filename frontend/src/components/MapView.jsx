@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/MapView.css";
 import geojson from "../assets/tadgeojson";
 import anganwadi from "../assets/AngawadiCenters.js";
 import canal from "../assets/Canal.js";
 import forest from "../assets/Forest.js";
+import * as turf from "@turf/turf";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmF5YXBhdGk0OSIsImEiOiJjbGVvMWp6OGIwajFpM3luNTBqZHhweXZzIn0.1r2DoIQ1Gf2K3e5WBgDNjA";
@@ -15,8 +17,10 @@ export default function MapView({
   isPOISectionVisible,
   districts,
   mandals,
+  villages,
   highlightDistrict,
   highlightMandal,
+  highlightVillage,
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -45,13 +49,16 @@ export default function MapView({
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on("load", () => {
+      // === Add Parcels
       map.current.addSource("parcels", { type: "geojson", data: geojson });
+
       map.current.addLayer({
         id: "parcels-fill",
         type: "fill",
         source: "parcels",
         paint: { "fill-color": "#0080ff", "fill-opacity": 0.3 },
       });
+
       map.current.addLayer({
         id: "parcels-outline",
         type: "line",
@@ -63,19 +70,89 @@ export default function MapView({
         const feature = e.features[0];
         onSelectPolygon(feature.properties);
       });
+      map.current.on("click", "parcels-fill", (e) => {
+        const feature = e.features[0];
+        const coordinates = e.lngLat;
+        const areaSqMeters = turf.area(feature); // feature must be a GeoJSON Feature
+        const areaAcres = areaSqMeters * 0.000247105;
 
-      // === Fit bounds to districts
-      const bounds = new mapboxgl.LngLatBounds();
-      districts.features.forEach((feature) => {
-        const coords = feature.geometry.coordinates;
-        const flatCoords =
-          feature.geometry.type === "Polygon" ? coords[0] : coords[0][0];
-        flatCoords.forEach(([lng, lat]) => bounds.extend([lng, lat]));
+        //fire external callback
+        onSelectPolygon(feature.properties);
+
+        // Create and show popup
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(
+            `
+            <strong>Parcel Number: </strong> ${
+              feature.properties.Parcel_num
+            }<br>
+            <strong>Parcel Area:
+            </strong> ${areaAcres.toFixed(2)} acres`
+          )
+          .addTo(map.current);
       });
-      map.current.fitBounds(bounds, { padding: 20 });
+
+      // === Parcel Number Labels
+      map.current.addLayer({
+        id: "parcels-label",
+        type: "symbol",
+        source: "parcels",
+        layout: {
+          "text-field": ["get", "Parcel_num"], // Change to the actual property name if different
+          "text-size": 12,
+          "text-font": ["Open Sans Bold"],
+          "text-offset": [0, 0.6],
+          "text-anchor": "top",
+        },
+        paint: {
+          "text-color": "#111",
+          "text-halo-color": "#fff",
+          "text-halo-width": 1.2,
+        },
+      });
+
+      // Add Villages
+
+      map.current.addSource("villages", { type: "geojson", data: villages });
+
+      map.current.addLayer({
+        id: "villages-fill",
+        type: "fill",
+        source: "villages",
+        paint: { "fill-color": "#ADD8E6", "fill-opacity": 0.4 },
+        layout: { visibility: "none" },
+      });
+
+      map.current.addLayer({
+        id: "villages-outline",
+        type: "line",
+        source: "villages",
+        paint: { "line-color": "#0a0a0a", "line-width": 2.5 },
+        layout: { visibility: "none" },
+      });
+
+      map.current.addLayer({
+        id: "villages-label",
+        type: "symbol",
+        source: "villages",
+        layout: {
+          "text-field": ["get", "NAME"],
+          "text-size": 14,
+          "text-font": ["Open Sans Bold"],
+          "text-anchor": "center",
+          visibility: "none",
+        },
+        paint: {
+          "text-color": "#004466",
+          "text-halo-color": "#fff",
+          "text-halo-width": 2,
+        },
+      });
 
       // === Add Districts
       map.current.addSource("districts", { type: "geojson", data: districts });
+
       map.current.addLayer({
         id: "districts-fill",
         type: "fill",
@@ -83,6 +160,7 @@ export default function MapView({
         paint: { "fill-color": "#ADD8E6", "fill-opacity": 0.4 },
         layout: { visibility: "none" },
       });
+
       map.current.addLayer({
         id: "districts-outline",
         type: "line",
@@ -90,6 +168,7 @@ export default function MapView({
         paint: { "line-color": "#0a0a0a", "line-width": 2.5 },
         layout: { visibility: "none" },
       });
+
       map.current.addLayer({
         id: "districts-label",
         type: "symbol",
@@ -110,6 +189,7 @@ export default function MapView({
 
       // === Add Mandals
       map.current.addSource("mandals", { type: "geojson", data: mandals });
+
       map.current.addLayer({
         id: "mandals-fill",
         type: "fill",
@@ -117,6 +197,7 @@ export default function MapView({
         paint: { "fill-color": "#FFD700", "fill-opacity": 0.3 },
         layout: { visibility: "none" },
       });
+
       map.current.addLayer({
         id: "mandals-outline",
         type: "line",
@@ -124,6 +205,7 @@ export default function MapView({
         paint: { "line-color": "#DAA520", "line-width": 2 },
         layout: { visibility: "none" },
       });
+
       map.current.addLayer({
         id: "mandals-label",
         type: "symbol",
@@ -186,11 +268,12 @@ export default function MapView({
         }
       });
 
-      // === Highlight layers
+      // === Highlight Layers
       map.current.addSource("highlight-district", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
       });
+
       map.current.addLayer({
         id: "highlight-district-line",
         type: "line",
@@ -202,6 +285,7 @@ export default function MapView({
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
       });
+
       map.current.addLayer({
         id: "highlight-mandal-line",
         type: "line",
@@ -228,20 +312,29 @@ export default function MapView({
         );
     });
 
+    //toggling district layers
     ["districts-fill", "districts-outline", "districts-label"].forEach((id) => {
       const visible = poiSettings["district"] ? "visible" : "none";
       if (map.current.getLayer(id))
         map.current.setLayoutProperty(id, "visibility", visible);
     });
 
+    //toggling mandal layers
     ["mandals-fill", "mandals-outline", "mandals-label"].forEach((id) => {
       const visible = poiSettings["mandal"] ? "visible" : "none";
       if (map.current.getLayer(id))
         map.current.setLayoutProperty(id, "visibility", visible);
     });
+
+    //toggling village layers
+    ["villages-fill", "villages-outline", "villages-label"].forEach((id) => {
+      const visible = poiSettings["village"] ? "visible" : "none";
+      if (map.current.getLayer(id))
+        map.current.setLayoutProperty(id, "visibility", visible);
+    });
   }, [poiSettings, isPOISectionVisible]);
 
-  // === Highlight district and mandal
+  // === Highlight District & Mandal
   useEffect(() => {
     if (!map.current) return;
 

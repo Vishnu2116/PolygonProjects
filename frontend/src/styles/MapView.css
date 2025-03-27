@@ -2,3 +2,22 @@
   width: 100%;
   height: 100vh; /* Or any specific height like 600px */
 }
+.mapboxgl-popup-close-button {
+  font-size: 12px; /* Make it smaller */
+  top: 2px; /* Reduce spacing from top */
+  right: 2px; /* Reduce spacing from right */
+  line-height: 1;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+}
+.mapboxgl-popup-content {
+  padding-top: 10px; /* adds space between close button and content */
+}
+.mapboxgl-popup-close-button:hover {
+  color: #2d3748;
+}

@@ -9,9 +9,11 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
 export default function HomePage({ onLogout }) {
   const [selectedFeature, setSelectedFeature] = useState(null);
-  const [isPOISectionVisible, setIsPOISectionVisible] = useState(true);
+  const [isPOISectionVisible, setIsPOISectionVisible] = useState(false);
   const [districts, setDistricts] = useState(null);
   const [mandals, setMandals] = useState(null);
+  const [villages, setVillages] = useState(null);
+  const [highlightVillage, setHighLightVillage] = useState(null);
   const [highlightDistrict, setHighlightDistrict] = useState(null);
   const [highlightMandal, setHighlightMandal] = useState(null);
 
@@ -44,10 +46,14 @@ export default function HomePage({ onLogout }) {
       try {
         const districtRes = await fetch("/District.json");
         const mandalRes = await fetch("/Mandal.json");
+        const VillageRes = await fetch("/Village.json");
         const districtData = await districtRes.json();
         const mandalData = await mandalRes.json();
+        const villageData = await VillageRes.json();
+
         setDistricts(districtData);
         setMandals(mandalData);
+        setVillages(villageData);
       } catch (error) {
         console.error("Error loading GeoJSON:", error);
       }
@@ -71,6 +77,8 @@ export default function HomePage({ onLogout }) {
           isPOISectionVisible={isPOISectionVisible}
           districts={districts}
           mandals={mandals}
+          villages={villages}
+          highlightVillage={highlightVillage}
           highlightDistrict={highlightDistrict}
           highlightMandal={highlightMandal}
         />
@@ -81,6 +89,7 @@ export default function HomePage({ onLogout }) {
           setIsPOISectionVisible={setIsPOISectionVisible}
           districts={districts}
           mandals={mandals}
+          onHighlightVillage={setHighLightVillage}
           onHighlightDistrict={setHighlightDistrict} // ✅ Fixed
           onHighlightMandal={setHighlightMandal} // ✅ Fixed
         />

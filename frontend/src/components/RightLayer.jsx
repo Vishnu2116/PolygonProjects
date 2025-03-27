@@ -9,6 +9,8 @@ export default function RightLayer({
   setIsPOISectionVisible,
   districts,
   mandals,
+  villages,
+  onHighlightVillage,
   onHighlightDistrict,
   onHighlightMandal,
 }) {
