@@ -61,9 +61,9 @@ const RecordDetails = ({ data, onClose }) => {
             className="manage-button-container"
             style={{ position: "relative" }}
           >
-            <button className="manage-button" onClick={toggleCategories}>
+            {/* <button className="manage-button" onClick={toggleCategories}>
               Manage
-            </button>
+            </button> */}
             {/* Record Categories positioned relative to manage button */}
             {showCategories && (
               <div className="categories-container-wrapper">
