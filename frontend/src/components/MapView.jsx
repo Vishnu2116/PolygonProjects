@@ -1,26 +1,27 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import * as turf from "@turf/turf";
+
 import "../styles/MapView.css";
 import geojson from "../assets/tadgeojson";
 import anganwadi from "../assets/AngawadiCenters.js";
 import canal from "../assets/Canal.js";
 import forest from "../assets/Forest.js";
-import * as turf from "@turf/turf";
 import LULC from "../assets/LULC.js";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmF5YXBhdGk0OSIsImEiOiJjbGVvMWp6OGIwajFpM3luNTBqZHhweXZzIn0.1r2DoIQ1Gf2K3e5WBgDNjA";
 
-  const LULC_COLORS = {
-    "Agriculture Land": "#1B5E20",
-    "Forest": "#1B3D1A",
-    "Water Body": "#0D47A1",
-    "Built Up": "#4A148C",
-    "Wastelands": "#3E2723",
-    "others": "#424242",
-  };
-  
+const LULC_COLORS = {
+  "Agriculture Land": "#1B5E20",
+  Forest: "#1B3D1A",
+  "Water Body": "#0D47A1",
+  "Built Up": "#4A148C",
+  Wastelands: "#3E2723",
+  others: "#424242",
+};
 
 export default function MapView({
   onSelectPolygon,
@@ -34,9 +35,14 @@ export default function MapView({
   highlightMandal,
   highlightVillage,
   lulcToggles,
+  activeTool,
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const draw = useRef(null);
+
+  const DEFAULT_CENTER = [80.6063, 16.475];
+  const DEFAULT_ZOOM = 13;
 
   const POI_LAYERS = [
     {
@@ -55,14 +61,14 @@ export default function MapView({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [80.60631782501012, 16.475043343851635],
-      zoom: 13,
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
     });
 
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on("load", () => {
-      // === Parcels
+      // === Parcel Layers
       map.current.addSource("parcels", { type: "geojson", data: geojson });
       map.current.addLayer({
         id: "parcels-fill",
@@ -95,22 +101,18 @@ export default function MapView({
 
       map.current.on("click", "parcels-fill", (e) => {
         const feature = e.features[0];
-        const coordinates = e.lngLat;
-        const areaSqMeters = turf.area(feature);
-        const areaAcres = areaSqMeters * 0.000247105;
+        const area = turf.area(feature) * 0.000247105;
         onSelectPolygon(feature.properties);
-
         new mapboxgl.Popup()
-          .setLngLat(coordinates)
+          .setLngLat(e.lngLat)
           .setHTML(
-            `<strong>Parcel Number: </strong>${
+            `<strong>Parcel Number:</strong> ${
               feature.properties.Parcel_num
-            }<br><strong>Parcel Area: </strong>${areaAcres.toFixed(2)} acres`
+            }<br><strong>Area:</strong> ${area.toFixed(2)} acres`
           )
           .addTo(map.current);
       });
 
-      // === Admin Boundaries
       const addBoundary = (id, data, nameField, fillColor, lineColor) => {
         map.current.addSource(id, { type: "geojson", data });
         map.current.addLayer({
@@ -149,7 +151,7 @@ export default function MapView({
       addBoundary("districts", districts, "NAME", "#ADD8E6", "#0a0a0a");
       addBoundary("mandals", mandals, "sdtname", "#FFD700", "#DAA520");
 
-      // === Highlight boundaries
+      // === Highlight Layers
       map.current.addSource("highlight-district", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -172,11 +174,10 @@ export default function MapView({
         paint: { "line-color": "red", "line-width": 3 },
       });
 
-      // === POIs
+      // === POI Layers
       POI_LAYERS.forEach(({ id, data, color }) => {
         map.current.addSource(id, { type: "geojson", data });
         const type = data.features[0]?.geometry?.type;
-
         if (type === "Point") {
           map.current.addLayer({
             id,
@@ -195,27 +196,13 @@ export default function MapView({
             id,
             type: "line",
             source: id,
-            paint: {
-              "line-color": color,
-              "line-width": 3,
-            },
-            layout: { visibility: "none" },
-          });
-        } else if (type === "MultiPolygon") {
-          map.current.addLayer({
-            id,
-            type: "fill",
-            source: id,
-            paint: {
-              "fill-color": color,
-              "fill-opacity": 0.4,
-            },
+            paint: { "line-color": color, "line-width": 3 },
             layout: { visibility: "none" },
           });
         }
       });
 
-      // === LULC Layers
+      // === LULC
       map.current.addSource("lulc", { type: "geojson", data: LULC });
       Object.entries(LULC_COLORS).forEach(([category, color]) => {
         const layerId = `lulc-${category.replace(/\s+/g, "-").toLowerCase()}`;
@@ -228,9 +215,23 @@ export default function MapView({
           layout: { visibility: "none" },
         });
       });
+
+      // === Draw Tool
+      draw.current = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {},
+        defaultMode: "simple_select",
+      });
+      map.current.addControl(draw.current);
+
+      // Automatically enter select mode after drawing
+      map.current.on("draw.create", () => {
+        draw.current.changeMode("simple_select");
+      });
     });
   }, [districts, mandals, villages]);
 
+  // === Handle Layer Toggles
   useEffect(() => {
     if (!map.current) return;
 
@@ -274,6 +275,7 @@ export default function MapView({
     });
   }, [poiSettings, isPOISectionVisible, lulcToggles, isLULCSectionVisible]);
 
+  // === Highlight and Zoom
   useEffect(() => {
     if (!map.current) return;
 
@@ -300,13 +302,44 @@ export default function MapView({
     }
 
     if (districtFeature) {
-      const bounds = turf.bbox(districtFeature);
-      map.current.fitBounds(bounds, { padding: 40 });
+      map.current.fitBounds(turf.bbox(districtFeature), { padding: 40 });
     } else if (mandalFeature) {
-      const bounds = turf.bbox(mandalFeature);
-      map.current.fitBounds(bounds, { padding: 40 });
+      map.current.fitBounds(turf.bbox(mandalFeature), { padding: 40 });
+    } else {
+      map.current.flyTo({
+        center: DEFAULT_CENTER,
+        zoom: DEFAULT_ZOOM,
+        essential: true,
+      });
     }
   }, [highlightDistrict, highlightMandal]);
+
+  // === Toolbar Interactions
+  useEffect(() => {
+    if (!map.current || !draw.current) return;
+
+    switch (activeTool) {
+      case "print":
+        window.print();
+        break;
+      case "pan":
+        map.current.boxZoom.enable();
+        draw.current.changeMode("simple_select");
+        break;
+      case "line":
+        draw.current.changeMode("draw_line_string");
+        break;
+      case "polygon":
+        draw.current.changeMode("draw_polygon");
+        break;
+      case "search":
+        console.log("Search tool activated");
+        break;
+      default:
+        draw.current.changeMode("simple_select");
+        break;
+    }
+  }, [activeTool]);
 
   return <div ref={mapContainer} className="map-container" />;
 }

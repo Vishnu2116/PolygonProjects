@@ -1,64 +1,33 @@
-import React, { useState } from 'react';
-import { 
-  FaPrint, 
-  FaSearch, 
-  FaHandPaper, 
+import React from "react";
+import {
+  FaPrint,
+  FaSearch,
+  FaHandPaper,
   FaRulerVertical,
-  FaDrawPolygon 
-} from 'react-icons/fa';
-import '../styles/ToolBar.css';
+  FaDrawPolygon,
+} from "react-icons/fa";
+import "../styles/ToolBar.css";
 
-const toolbarItems = [
-  { 
-    icon: FaPrint, 
-    tooltip: 'Print',
-    action: () => console.log('Print action') 
-  },
-  { 
-    icon: FaSearch, 
-    tooltip: 'Search',
-    action: () => console.log('Search action') 
-  },
-  { 
-    icon: FaHandPaper, 
-    tooltip: 'Pan',
-    action: () => console.log('Pan action') 
-  },
-  { 
-    icon: FaRulerVertical, 
-    tooltip: 'Line Scale',
-    action: () => console.log('Line Scale action') 
-  },
-  { 
-    icon: FaDrawPolygon, 
-    tooltip: 'Polygon Scale',
-    action: () => console.log('Polygon Scale action') 
-  }
+const tools = [
+  { icon: FaPrint, tooltip: "Print", tool: "print" },
+  { icon: FaHandPaper, tooltip: "Pan", tool: "pan" },
+  { icon: FaRulerVertical, tooltip: "Line Scale", tool: "line" },
+  { icon: FaDrawPolygon, tooltip: "Polygon Scale", tool: "polygon" },
 ];
 
-const ToolBar = () => {
-  const [activeItem, setActiveItem] = useState(null);
-
-  const handleItemClick = (index) => {
-    setActiveItem(index);
-    toolbarItems[index].action();
-  };
-
+const ToolBar = ({ activeTool, setActiveTool }) => {
   return (
     <div className="toolbar">
-      {toolbarItems.map((item, index) => {
-        const IconComponent = item.icon;
-        return (
-          <div 
-            key={index} 
-            className={`toolbar-item ${activeItem === index ? 'active' : ''}`}
-            onClick={() => handleItemClick(index)}
-            title={item.tooltip}
-          >
-            <IconComponent className="toolbar-icon" />
-          </div>
-        );
-      })}
+      {tools.map(({ icon: Icon, tooltip, tool }) => (
+        <div
+          key={tool}
+          className={`toolbar-item ${activeTool === tool ? "active" : ""}`}
+          onClick={() => setActiveTool(tool)}
+          title={tooltip}
+        >
+          <Icon className="toolbar-icon" />
+        </div>
+      ))}
     </div>
   );
 };

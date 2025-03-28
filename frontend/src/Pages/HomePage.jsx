@@ -19,6 +19,7 @@ export default function HomePage({ onLogout }) {
   const [highlightMandal, setHighlightMandal] = useState(null);
   const [highlightVillage, setHighlightVillage] = useState(null);
   const [lulcToggles, setLulcToggles] = useState({});
+  const [activeTool, setActiveTool] = useState(null);
 
   const [poiSettings, setPoiSettings] = useState({
     district: false,
@@ -82,6 +83,7 @@ export default function HomePage({ onLogout }) {
           highlightMandal={highlightMandal}
           highlightVillage={highlightVillage}
           lulcToggles={lulcToggles}
+          activeTool={activeTool}
         />
         <RightLayer
           settings={poiSettings}
@@ -98,7 +100,7 @@ export default function HomePage({ onLogout }) {
           isLULCSectionVisible={isLULCSectionVisible}
           setIsLULCSectionVisible={setIsLULCSectionVisible}
         />
-        <ToolBar/>
+        <ToolBar setActiveTool={setActiveTool} />
       </div>
     </div>
   );

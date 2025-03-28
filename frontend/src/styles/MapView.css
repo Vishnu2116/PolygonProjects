@@ -22,7 +22,6 @@
   color: #2d3748;
 }
 
-
 /* Enhance default zoom controls */
 .mapboxgl-ctrl-group {
   border-radius: 3px;
@@ -31,15 +30,23 @@
 }
 
 .mapboxgl-ctrl-group > .mapboxgl-ctrl-zoom-in,
-.mapboxgl-ctrl-group > .mapboxgl-ctrl-zoom-out {
-  width: 50px;  /* Increase width */
+.mapboxgl-ctrl-group > .mapboxgl-ctrl-zoom-out,
+.mapboxgl-ctrl-group > .mapboxgl-ctrl-icon {
+  width: 50px; /* Increase width */
   height: 50px; /* Increase height */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px; /* Larger font size for zoom buttons */
 }
-
+.mapboxgl-ctrl-group > .mapboxgl-ctrl-icon {
+  width: 100px; /* Increase width */
+  height: 500px; /* Increase height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px; /* Larger font size for zoom buttons */
+}
 /* Optional: Add hover effect */
 .mapboxgl-ctrl-group > button:hover {
   background-color: #f0f0f0;
