@@ -12,7 +12,11 @@
   max-height: calc(100vh - 40px);
   overflow-y: auto;
   transition: all 0.3s ease;
+<<<<<<< HEAD
   margin-right: 100px;
+=======
+  margin-right: 65px;
+>>>>>>> 94ade30f1e68afecfce1fdf1dce8880b4f5719d1
 }
 
 .panel-title {

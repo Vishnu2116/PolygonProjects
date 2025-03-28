@@ -11,11 +11,11 @@ import "../styles/RightLayer.css";
 
 const LULC_COLORS = {
   "Agriculture Land": "#4CAF50",
-  Forest: "#2E7D32",
+  "Forest": "#2E7D32",
   "Water Body": "#1E88E5",
   "Built Up": "#8E24AA",
-  Wastelands: "#6D4C41",
-  others: "#757575",
+ " Wastelands": "#6D4C41",
+  "others": "#757575",
 };
 
 export default function RightLayer({

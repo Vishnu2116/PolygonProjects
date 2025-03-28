@@ -12,14 +12,15 @@ import LULC from "../assets/LULC.js";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmF5YXBhdGk0OSIsImEiOiJjbGVvMWp6OGIwajFpM3luNTBqZHhweXZzIn0.1r2DoIQ1Gf2K3e5WBgDNjA";
 
-const LULC_COLORS = {
-  "Agriculture Land": "#4CAF50",
-  Forest: "#2E7D32",
-  "Water Body": "#1E88E5",
-  "Built Up": "#8E24AA",
-  Wastelands: "#6D4C41",
-  others: "#757575",
-};
+  const LULC_COLORS = {
+    "Agriculture Land": "#1B5E20",
+    "Forest": "#1B3D1A",
+    "Water Body": "#0D47A1",
+    "Built Up": "#4A148C",
+    "Wastelands": "#3E2723",
+    "others": "#424242",
+  };
+  
 
 export default function MapView({
   onSelectPolygon,
@@ -222,7 +223,7 @@ export default function MapView({
           id: layerId,
           type: "fill",
           source: "lulc",
-          paint: { "fill-color": color, "fill-opacity": 0.5 },
+          paint: { "fill-color": color, "fill-opacity": 0.9 },
           filter: ["==", ["get", "LULC_1"], category],
           layout: { visibility: "none" },
         });
