@@ -4,6 +4,7 @@ import MapView from "../components/MapView";
 import RightLayer from "../components/RightLayer";
 import RecordDetails from "../components/Records/RecordDetails";
 import "../styles/HomePage.css";
+import ToolBar from "../components/ToolBar";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
@@ -97,6 +98,7 @@ export default function HomePage({ onLogout }) {
           isLULCSectionVisible={isLULCSectionVisible}
           setIsLULCSectionVisible={setIsLULCSectionVisible}
         />
+        <ToolBar/>
       </div>
     </div>
   );
