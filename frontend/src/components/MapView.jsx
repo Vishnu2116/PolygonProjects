@@ -191,12 +191,34 @@ export default function MapView({
             },
             layout: { visibility: "none" },
           });
-        } else if (type === "MultiLineString") {
+        } else if (type === "MultiLineString" || type === "LineString") {
           map.current.addLayer({
             id,
             type: "line",
             source: id,
             paint: { "line-color": color, "line-width": 3 },
+            layout: { visibility: "none" },
+          });
+        } else if (type === "Polygon" || type === "MultiPolygon") {
+          map.current.addLayer({
+            id,
+            type: "fill",
+            source: id,
+            paint: {
+              "fill-color": color,
+              "fill-opacity": 0.6,
+            },
+            layout: { visibility: "none" },
+          });
+          // optional outline
+          map.current.addLayer({
+            id: `${id}-outline`,
+            type: "line",
+            source: id,
+            paint: {
+              "line-color": color,
+              "line-width": 2,
+            },
             layout: { visibility: "none" },
           });
         }
