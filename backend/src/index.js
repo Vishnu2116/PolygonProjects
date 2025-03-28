@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 const allowedOrigins = [
-  "https://polygonprojects-1.onrender.com",
+  "https://indgeos.onrender.com",
   "http://localhost:5173",
 ];
 
