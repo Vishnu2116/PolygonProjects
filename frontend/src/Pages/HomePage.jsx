@@ -5,9 +5,10 @@ import RightLayer from "../components/RightLayer";
 import RecordDetails from "../components/Records/RecordDetails";
 import "../styles/HomePage.css";
 import ToolBar from "../components/ToolBar";
+import hospital from "../assets/pois/Hospital";
+import electricPoles from "../assets/pois/ElectricPoles";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
-
 
 export default function HomePage({ onLogout }) {
   const [selectedFeature, setSelectedFeature] = useState(null);
@@ -29,6 +30,17 @@ export default function HomePage({ onLogout }) {
     anganwadi: false,
     canal: false,
     forest: false,
+    civilSupplies: false,
+    muncipalities: false,
+    hospitals: false,
+    archmuse: false,
+    drainage: false,
+    electricpoles: false,
+    policeSt: false,
+    policeSur: false,
+    railway: false,
+    river: false,
+    roads: false,
   });
 
   const handleLogout = async () => {
@@ -93,7 +105,7 @@ export default function HomePage({ onLogout }) {
           setIsPOISectionVisible={setIsPOISectionVisible}
           districts={districts}
           mandals={mandals}
-          villages={villages} 
+          villages={villages}
           onHighlightDistrict={setHighlightDistrict}
           onHighlightMandal={setHighlightMandal}
           onHighlightVillage={setHighlightVillage}

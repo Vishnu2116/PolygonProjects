@@ -5,11 +5,21 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf";
 
 import "../styles/MapView.css";
-import geojson from "../assets/tadgeojson";
-import anganwadi from "../assets/AngawadiCenters.js";
-import canal from "../assets/Canal.js";
-import forest from "../assets/Forest.js";
-import LULC from "../assets/LULC.js";
+import geojson from "../assets/joine3_lulc.js";
+import anganwadi from "../assets/pois/AngawadiCenters.js";
+import canal from "../assets/pois/Canal.js";
+import forest from "../assets/pois/Forest.js";
+import civilSupplies from "../assets/pois/CivilSupplies.js";
+import muncipality from "../assets/pois/Muncipalities.js";
+import hospital from "../assets/pois/Hospital.js";
+import archMuse from "../assets/pois/ArchaeologyMuseums.js";
+import drainage from "../assets/pois/Drainage.js";
+import electricPoles from "../assets/pois/ElectricPoles.js";
+import policeStation from "../assets/pois/PoliceStation.js";
+import policeSurveillance from "../assets/pois/PoliceSurveillance.js";
+import RailwayNetwork from "../assets/pois/RailwayNetwork.js";
+import river from "../assets/pois/River.js";
+import roads from "../assets/pois/Roads.js";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmF5YXBhdGk0OSIsImEiOiJjbGVvMWp6OGIwajFpM3luNTBqZHhweXZzIn0.1r2DoIQ1Gf2K3e5WBgDNjA";
@@ -49,10 +59,86 @@ export default function MapView({
       id: "poi-anganwadi",
       data: anganwadi,
       setting: "anganwadi",
-      color: "#FF5733",
+      color: "#FF5733", // Kept same
     },
-    { id: "poi-canal", data: canal, setting: "canal", color: "#2ECC71" },
-    { id: "poi-forest", data: forest, setting: "forest", color: "#006400" },
+    {
+      id: "poi-canal",
+      data: canal,
+      setting: "canal",
+      color: "#2ECC71", // Kept same
+    },
+    {
+      id: "poi-forest",
+      data: forest,
+      setting: "forest",
+      color: "#006400", // Kept same
+    },
+    {
+      id: "poi-civilsupplies",
+      data: civilSupplies,
+      setting: "civilSupplies",
+      color: "#1E88E5", // Bright Blue
+    },
+    {
+      id: "poi-muncipalities",
+      data: muncipality,
+      setting: "muncipalities",
+      color: "#F9A825", // Yellowish Amber
+    },
+    {
+      id: "poi-hospital",
+      data: hospital,
+      setting: "hospitals",
+      color: "#C62828", // Rich Red
+    },
+    {
+      id: "poi-archmuse",
+      data: archMuse,
+      setting: "archmuse",
+      color: "#6D4C41", // Brown (Soft contrast)
+    },
+    {
+      id: "poi-drainage",
+      data: drainage,
+      setting: "drainage",
+      color: "#039BE5", // Light Blue
+    },
+    {
+      id: "poi-electricpoles",
+      data: electricPoles,
+      setting: "electricpoles",
+      color: "#F57C00", // Orange
+    },
+    {
+      id: "poi-police",
+      data: policeStation,
+      setting: "policeSt",
+      color: "#5E35B1", // Deep Purple
+    },
+    {
+      id: "poi-polsur",
+      data: policeSurveillance,
+      setting: "policeSur",
+      color: "#00897B", // Teal
+    },
+    {
+      id: "poi-railway",
+      data: RailwayNetwork,
+      setting: "railway",
+      color: "#546E7A", // Blue Grey
+    },
+    {
+      id: "poi-river",
+      data: river,
+      setting: "river",
+      color: "#00ACC1", // Cyan
+    },
+    {
+      id: "poi-roads",
+      data: roads,
+      setting: "roads",
+      color: "#FF7043", // Coral
+    },
   ];
 
   useEffect(() => {
@@ -225,7 +311,7 @@ export default function MapView({
       });
 
       // === LULC
-      map.current.addSource("lulc", { type: "geojson", data: LULC });
+      map.current.addSource("lulc", { type: "geojson", data: geojson });
       Object.entries(LULC_COLORS).forEach(([category, color]) => {
         const layerId = `lulc-${category.replace(/\s+/g, "-").toLowerCase()}`;
         map.current.addLayer({

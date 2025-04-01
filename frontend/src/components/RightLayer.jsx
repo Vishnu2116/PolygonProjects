@@ -11,11 +11,11 @@ import "../styles/RightLayer.css";
 
 const LULC_COLORS = {
   "Agriculture Land": "#4CAF50",
-  "Forest": "#2E7D32",
+  Forest: "#2E7D32",
   "Water Body": "#1E88E5",
   "Built Up": "#8E24AA",
-  "Wastelands": "#6D4C41",
-  "others": "#757575",
+  Wastelands: "#6D4C41",
+  others: "#757575",
 };
 
 export default function RightLayer({
@@ -69,42 +69,42 @@ export default function RightLayer({
   // Get unique districts from villages data
   const districtList = useMemo(() => {
     if (!villages?.features) return [];
-    
+
     const uniqueDistricts = new Set();
-    villages.features.forEach(feature => {
+    villages.features.forEach((feature) => {
       if (feature.properties?.District) {
         uniqueDistricts.add(feature.properties.District);
       }
     });
-    
-    return Array.from(uniqueDistricts).map(district => ({
+
+    return Array.from(uniqueDistricts).map((district) => ({
       original: district,
-      normalized: normalize(district)
+      normalized: normalize(district),
     }));
   }, [villages]);
 
   // Get unique mandals from villages data, filtered by selected district
   const mandalList = useMemo(() => {
     if (!villages?.features) return [];
-    
+
     const uniqueMandals = new Map(); // Using Map to preserve district info
-    
-    villages.features.forEach(feature => {
+
+    villages.features.forEach((feature) => {
       const mandal = feature.properties?.Mandal;
       const district = feature.properties?.District;
-      
+
       if (mandal && district) {
         const key = `${district}-${mandal}`;
         if (!uniqueMandals.has(key)) {
           uniqueMandals.set(key, {
             original: mandal,
             normalized: normalize(mandal),
-            district: district
+            district: district,
           });
         }
       }
     });
-    
+
     return Array.from(uniqueMandals.values());
   }, [villages]);
 
@@ -126,7 +126,7 @@ export default function RightLayer({
       )
       .map((m) => ({
         name: m.original,
-        district: m.district
+        district: m.district,
       }));
   }, [mandalSearchTerm, selectedDistrict, mandalList]);
 
@@ -386,6 +386,17 @@ export default function RightLayer({
             {renderToggle("Anganwadi Centers", "anganwadi")}
             {renderToggle("Canal", "canal")}
             {renderToggle("Forest", "forest")}
+            {renderToggle("CivilSupplies", "civilSupplies")}
+            {renderToggle("Muncipalities", "muncipalities")}
+            {renderToggle("Hospitals", "hospitals")}
+            {renderToggle("Museums", "archmuse")}
+            {renderToggle("Drainage", "drainage")}
+            {renderToggle("Electric Poles", "electricpoles")}
+            {renderToggle("Police Station", "policeSt")}
+            {renderToggle("Police Surveilance", "policeSur")}
+            {renderToggle("Railway Network", "railway")}
+            {renderToggle("River", "river")}
+            {renderToggle("Roads", "roads")}
           </div>
         )}
       </div>
