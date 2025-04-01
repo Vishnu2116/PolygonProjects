@@ -8,6 +8,7 @@ import ToolBar from "../components/ToolBar";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
+
 export default function HomePage({ onLogout }) {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [isPOISectionVisible, setIsPOISectionVisible] = useState(false);
@@ -92,6 +93,7 @@ export default function HomePage({ onLogout }) {
           setIsPOISectionVisible={setIsPOISectionVisible}
           districts={districts}
           mandals={mandals}
+          villages={villages} 
           onHighlightDistrict={setHighlightDistrict}
           onHighlightMandal={setHighlightMandal}
           onHighlightVillage={setHighlightVillage}

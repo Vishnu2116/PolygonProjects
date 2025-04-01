@@ -14,7 +14,7 @@ const LULC_COLORS = {
   "Forest": "#2E7D32",
   "Water Body": "#1E88E5",
   "Built Up": "#8E24AA",
- " Wastelands": "#6D4C41",
+  "Wastelands": "#6D4C41",
   "others": "#757575",
 };
 
@@ -25,6 +25,7 @@ export default function RightLayer({
   setIsPOISectionVisible,
   districts,
   mandals,
+  villages,
   onHighlightDistrict,
   onHighlightMandal,
   onHighlightVillage,
@@ -65,24 +66,47 @@ export default function RightLayer({
 
   const normalize = (str) => str.toLowerCase().replace(/\s+/g, " ").trim();
 
+  // Get unique districts from villages data
   const districtList = useMemo(() => {
-    return (districts?.features || [])
-      .filter((f) => f.properties?.NAME)
-      .map((f) => ({
-        original: f.properties.NAME,
-        normalized: normalize(f.properties.NAME),
-      }));
-  }, [districts]);
+    if (!villages?.features) return [];
+    
+    const uniqueDistricts = new Set();
+    villages.features.forEach(feature => {
+      if (feature.properties?.District) {
+        uniqueDistricts.add(feature.properties.District);
+      }
+    });
+    
+    return Array.from(uniqueDistricts).map(district => ({
+      original: district,
+      normalized: normalize(district)
+    }));
+  }, [villages]);
 
+  // Get unique mandals from villages data, filtered by selected district
   const mandalList = useMemo(() => {
-    return (mandals?.features || [])
-      .filter((f) => f.properties?.sdtname && f.properties?.dtname)
-      .map((f) => ({
-        original: f.properties.sdtname,
-        normalized: normalize(f.properties.sdtname),
-        district: f.properties.dtname,
-      }));
-  }, [mandals]);
+    if (!villages?.features) return [];
+    
+    const uniqueMandals = new Map(); // Using Map to preserve district info
+    
+    villages.features.forEach(feature => {
+      const mandal = feature.properties?.Mandal;
+      const district = feature.properties?.District;
+      
+      if (mandal && district) {
+        const key = `${district}-${mandal}`;
+        if (!uniqueMandals.has(key)) {
+          uniqueMandals.set(key, {
+            original: mandal,
+            normalized: normalize(mandal),
+            district: district
+          });
+        }
+      }
+    });
+    
+    return Array.from(uniqueMandals.values());
+  }, [villages]);
 
   const filteredDistricts = useMemo(() => {
     const term = normalize(districtSearchTerm);
@@ -102,10 +126,11 @@ export default function RightLayer({
       )
       .map((m) => ({
         name: m.original,
-        district: m.district,
+        district: m.district
       }));
   }, [mandalSearchTerm, selectedDistrict, mandalList]);
 
+  // Rest of the component remains the same...
   const lulcCategories = useMemo(() => {
     return [
       ...new Set(
@@ -173,6 +198,12 @@ export default function RightLayer({
 
   const renderLULCToggle = (category) => (
     <div className="toggle-container lulc-toggle-container" key={category}>
+      <div
+        className="lulc-color-box"
+        style={{ backgroundColor: LULC_COLORS[category] || "#ccc" }}
+        title={category}
+      ></div>
+      <span className="toggle-label">{category}</span>
       <button
         className={`toggle ${lulcToggles[category] ? "toggle-active" : ""}`}
         onClick={() => toggleLULCCategory(category)}
@@ -181,11 +212,6 @@ export default function RightLayer({
       >
         <span className="toggle-thumb"></span>
       </button>
-      <span className="toggle-label">{category}</span>
-      <div
-        className="lulc-color-box"
-        style={{ backgroundColor: LULC_COLORS[category] || "#ccc" }}
-      ></div>
     </div>
   );
 
