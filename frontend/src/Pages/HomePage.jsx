@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import MapView from "../components/MapView";
-import RightLayer from "../components/RightLayer";
-import RecordDetails from "../components/Records/RecordDetails";
+import RightLayer from "../components/Layers/Layers";
+import RecordDetails from "../components/Records";
 import "../styles/HomePage.css";
 import ToolBar from "../components/ToolBar";
 import Search from "../components/Search";
