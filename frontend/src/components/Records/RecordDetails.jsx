@@ -3,8 +3,10 @@ import { ArrowLeft } from "lucide-react";
 import "../../styles/RecordDetails.css";
 import RecordCategories from "./RecordCategories"; // Make sure path is correct
 
-const RecordDetails = ({ data, onClose }) => {
+const RecordDetails = ({ data, onClose, isSearchExpanded }) => {
   // ✅ Accept props
+  const topPosition = isSearchExpanded ? "400px" : "180px";
+  // console.log(topPosition);
   const [showCategories, setShowCategories] = useState(false);
 
   const toggleCategories = () => {
@@ -26,18 +28,16 @@ const RecordDetails = ({ data, onClose }) => {
     LULC_1: "LULC Category",
   };
 
-  //console.log(data);
-
   return (
     <>
-      <div className="records-sidebar">
-        <div className="records-header">
-          <button className="back-button" onClick={onClose}>
-            <ArrowLeft size={20} />
-          </button>
-          <h2 className="location-title">Tadepalli</h2>
-        </div>
-
+      <div
+        className="records-sidebar"
+        style={{
+          top: topPosition,
+          transition: "top 0.3s ease",
+          pointerEvents: 'auto' // Optional: Add smooth transition
+        }}
+      >
         <div className="section-header">
           <div className="section-title">
             <div className="icon-container">
@@ -72,7 +72,16 @@ const RecordDetails = ({ data, onClose }) => {
                 />
               </svg>
             </div>
-            <span>Records</span>
+            <button
+              className="back-button"
+              onClick={(e) => {
+                e.stopPropagation(); // Add this line
+                onClose();
+              }}
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <h2 className="location-title">Records</h2>
           </div>
           <div
             className="manage-button-container"

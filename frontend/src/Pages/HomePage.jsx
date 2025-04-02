@@ -5,8 +5,7 @@ import RightLayer from "../components/RightLayer";
 import RecordDetails from "../components/Records/RecordDetails";
 import "../styles/HomePage.css";
 import ToolBar from "../components/ToolBar";
-import hospital from "../assets/pois/Hospital";
-import electricPoles from "../assets/pois/ElectricPoles";
+import Search from "../components/Search";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
@@ -22,6 +21,7 @@ export default function HomePage({ onLogout }) {
   const [highlightVillage, setHighlightVillage] = useState(null);
   const [lulcToggles, setLulcToggles] = useState({});
   const [activeTool, setActiveTool] = useState(null);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const [poiSettings, setPoiSettings] = useState({
     district: false,
@@ -78,12 +78,19 @@ export default function HomePage({ onLogout }) {
     <div className="app-container">
       <Navbar onLogout={handleLogout} />
       <div className="map-container">
-        {selectedFeature && (
-          <RecordDetails
-            data={selectedFeature}
-            onClose={() => setSelectedFeature(null)}
-          />
-        )}
+        <div
+          className="records-container"
+          style={{ pointerEvents: selectedFeature ? "auto" : "none" }}
+        >
+          {selectedFeature && (
+            <RecordDetails
+              data={selectedFeature}
+              isSearchExpanded={isSearchExpanded}
+              onClose={() => setSelectedFeature(null)}
+            />
+          )}
+        </div>
+
         <MapView
           onSelectPolygon={(props) => setSelectedFeature(props)}
           poiSettings={poiSettings}
@@ -98,22 +105,32 @@ export default function HomePage({ onLogout }) {
           lulcToggles={lulcToggles}
           activeTool={activeTool}
         />
+
         <RightLayer
           settings={poiSettings}
           setSettings={setPoiSettings}
           isPOISectionVisible={isPOISectionVisible}
           setIsPOISectionVisible={setIsPOISectionVisible}
-          districts={districts}
-          mandals={mandals}
-          villages={villages}
-          onHighlightDistrict={setHighlightDistrict}
-          onHighlightMandal={setHighlightMandal}
-          onHighlightVillage={setHighlightVillage}
           lulcToggles={lulcToggles}
           setLulcToggles={setLulcToggles}
           isLULCSectionVisible={isLULCSectionVisible}
           setIsLULCSectionVisible={setIsLULCSectionVisible}
         />
+
+        <div className="controls-container">
+          {districts && mandals && villages && (
+            <Search
+              districts={districts}
+              mandals={mandals}
+              villages={villages}
+              onHighlightDistrict={setHighlightDistrict}
+              onHighlightMandal={setHighlightMandal}
+              onHighlightVillage={setHighlightVillage}
+              onToggle={setIsSearchExpanded}
+            />
+          )}
+        </div>
+
         <ToolBar setActiveTool={setActiveTool} />
       </div>
     </div>
