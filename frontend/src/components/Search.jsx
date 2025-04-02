@@ -25,8 +25,8 @@ export default function Search({
   const [showVillageDropdown, setShowVillageDropdown] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
- // Remove the duplicate handleSearchToggle and keep only this one:
-const handleSearchToggle = (e) => {
+  // Remove the duplicate handleSearchToggle and keep only this one:
+  const handleSearchToggle = (e) => {
     e.stopPropagation(); // Prevent event bubbling
     const newState = !isSearchExpanded;
     setIsSearchExpanded(newState);
@@ -146,18 +146,18 @@ const handleSearchToggle = (e) => {
   // Handle clicks outside of dropdowns
   useEffect(() => {
     function handleClickOutside(event) {
-        if (
-          searchContainerRef.current &&
-          !searchContainerRef.current.contains(event.target)&&
-          !document.querySelector('.records-sidebar')?.contains(event.target)   
-        ) {
-          // Only auto-close if nothing is selected AND we're not clicking on the header
-          if (!selectedDistrict && !selectedMandal && !selectedVillage) {
-            setIsSearchExpanded(false);
-            if (onToggle) onToggle(false);
-          }
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target) &&
+        !document.querySelector(".records-sidebar")?.contains(event.target)
+      ) {
+        // Only auto-close if nothing is selected AND we're not clicking on the header
+        if (!selectedDistrict && !selectedMandal && !selectedVillage) {
+          setIsSearchExpanded(false);
+          if (onToggle) onToggle(false);
         }
-      
+      }
+
       if (
         districtDropdownRef.current &&
         !districtDropdownRef.current.contains(event.target)
@@ -177,7 +177,7 @@ const handleSearchToggle = (e) => {
         setShowVillageDropdown(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -220,9 +220,9 @@ const handleSearchToggle = (e) => {
     if (onHighlightDistrict) onHighlightDistrict(village.district);
   };
 
-//   const handleSearchToggle = () => {
-//     setIsSearchExpanded(!isSearchExpanded);
-//   };
+  //   const handleSearchToggle = () => {
+  //     setIsSearchExpanded(!isSearchExpanded);
+  //   };
 
   const clearAll = () => {
     setDistrictSearchTerm("");
@@ -239,7 +239,7 @@ const handleSearchToggle = (e) => {
   // Function to render dropdown items
   const renderDropdownItems = (items, handleSelect) => {
     return items.map((item, index) => {
-      if (typeof item === 'string') {
+      if (typeof item === "string") {
         return (
           <div
             key={index}
@@ -258,7 +258,8 @@ const handleSearchToggle = (e) => {
           >
             <span className="search-item-primary">{item.name}</span>
             <span className="search-item-secondary">
-              {item.mandal ? `${item.mandal}, ` : ''}{item.district} {!item.mandal && 'District'}
+              {item.mandal ? `${item.mandal}, ` : ""}
+              {item.district} {!item.mandal && "District"}
             </span>
           </div>
         );
@@ -279,19 +280,24 @@ const handleSearchToggle = (e) => {
 
   return (
     <div className="search-container" ref={searchContainerRef}>
-      <div 
-        className={`search-header ${(selectedDistrict || selectedMandal || selectedVillage) ? 'with-selection' : ''}`}
+      <div
+        className={`search-header ${
+          selectedDistrict || selectedMandal || selectedVillage
+            ? "with-selection"
+            : ""
+        }`}
         onClick={handleSearchToggle}
       >
         <div className="search-title">{getSelectedLocationDisplay()}</div>
-        <div className="search-toggle-icon">
-          {isSearchExpanded ? '▲' : '▼'}
-        </div>
+        <div className="search-toggle-icon">{isSearchExpanded ? "▲" : "▼"}</div>
         {(selectedDistrict || selectedMandal || selectedVillage) && (
-          <button className="clear-all-button" onClick={(e) => {
-            e.stopPropagation();
-            clearAll();
-          }}>
+          <button
+            className="clear-all-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              clearAll();
+            }}
+          >
             Clear
           </button>
         )}
