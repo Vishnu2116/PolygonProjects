@@ -1,0 +1,340 @@
+.layers-panel {
+  /* position: fixed; */
+  top: 16px;
+  left: 0px;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+      Arial, sans-serif;
+  z-index: 10;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  margin-left: 15px;
+  padding-bottom: 10px;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 16px 0;
+}
+
+/* .section {
+
+  margin-bottom: 20px;
+} */
+
+.section-title {
+  padding-left: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  /* color: #4a5568; */
+
+}
+
+.section-header {
+  /* display: flex; */
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  width: 100%; /* Added to ensure full width */
+}
+
+.toggle {
+  position: relative;
+  width: 38px;
+  height: 20px;
+  background-color: #e2e8f0;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease;
+  outline: none;
+  order: 2; /* Move toggle to the right */
+}
+
+.toggle:focus {
+  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.3);
+}
+
+.toggle:hover {
+  background-color: #3182ce;
+}
+
+.toggle-active {
+  background-color: #4299e1;
+}
+
+.toggle-active:hover {
+  background-color: #2b6cb0;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-active .toggle-thumb {
+  transform: translateX(18px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  color: #4a5568;
+  user-select: none;
+  order: 1; /* Move label to the left */
+  /* font-weight: bold; */
+}
+.font__{
+  font-weight: bolder;
+}
+
+.section-toggle {
+  min-width: 38px;
+}
+
+/* Dropdown search input */
+.search-section {
+  margin-bottom: 20px;
+  padding: 0 16px;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2d3748;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding-right: 36px;
+}
+
+.search-input:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.clear-button {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #718096;
+  z-index: 3;
+  padding: 0;
+  line-height: 1;
+}
+
+.dropdown-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  z-index: 30;
+  overflow: hidden;
+}
+
+.district-dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #2d3748;
+  transition: all 0.2s ease;
+}
+
+.district-dropdown-item:hover {
+  background-color: #f7fafc;
+  color: #3182ce;
+}
+
+.district-dropdown-item:active {
+  background-color: #e2e8f0;
+}
+
+.no-results {
+  padding: 15px;
+  text-align: center;
+  color: #718096;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  font-style: italic;
+}
+
+/* Scrollbar for dropdowns */
+.district-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.district-dropdown::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+.district-dropdown::-webkit-scrollbar-thumb:hover {
+  background-color: #a0aec0;
+}
+
+/* Mandal dropdown details */
+.mandal-name {
+  font-size: 14px;
+  color: #2d3748;
+}
+.mandal-district-info {
+  font-size: 12px;
+  color: #718096;
+  margin-left: 8px;
+}
+
+/* Selected info */
+.selected-location {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background-color: #f0f4f8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #2c5282;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.lulc-toggle-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+  gap: 8px; /* Consistent gap between elements */
+}
+
+.lulc-color-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  flex-shrink: 0; /* Prevent shrinking */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  order: 1; /* Color box first */
+  margin-right: 0; /* Remove any margin */
+}
+
+.lulc-toggle-container .toggle-label {
+  order: 2; /* Label after color box */
+  flex-grow: 1; /* Allow label to take available space */
+  text-align: left; /* Align text to left */
+  padding-right: 8px; /* Space between label and toggle */
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* font-weight:bold; */
+}
+
+
+.lulc-toggle-container .toggle {
+  order: 3; /* Toggle last */
+  flex-shrink: 0; /* Prevent toggle from shrinking */
+}
+
+
+.lulc-color-box:hover {
+  transform: scale(1.1);
+}
+
+/* Add these styles to match mandal search styling */
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+.village-dropdown-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.village-name {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.village-location-info {
+  font-size: 0.85em;
+  color: #666;
+  display: flex;
+  gap: 8px;
+}
+
+.village-location-info span:first-child {
+  color: #5f6368;/* Blue color for mandal name like in mandal search */
+}
+
+.village-location-info span:last-child {
+  color: #5f6368; /* Gray color for district */
+}
+
+/* Ensure dropdowns have consistent styling */
+.dropdown-wrapper {
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.no-results {
+  padding: 12px;
+  color: #5f6368;
+  text-align: center;
+}
