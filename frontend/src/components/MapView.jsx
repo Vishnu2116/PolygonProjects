@@ -3,6 +3,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf";
+import bbox from "@turf/bbox";
 
 import "../styles/MapView.css";
 import geojson from "../assets/joine3_lulc.js";
@@ -24,6 +25,22 @@ import roads from "../assets/pois/Roads.js";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmF5YXBhdGk0OSIsImEiOiJjbGVvMWp6OGIwajFpM3luNTBqZHhweXZzIn0.1r2DoIQ1Gf2K3e5WBgDNjA";
 
+const seenParcels = new Set();
+const uniqueFeatures = [];
+
+for (const feature of geojson.features) {
+  const parcelNum = String(feature.properties?.Parcel_num || "").trim();
+  if (parcelNum && !seenParcels.has(parcelNum)) {
+    seenParcels.add(parcelNum);
+    uniqueFeatures.push(feature);
+  }
+}
+
+const deduplicatedGeoJSON = {
+  ...geojson,
+  features: uniqueFeatures,
+};
+
 const LULC_COLORS = {
   "Agriculture Land": "#1B5E20",
   Forest: "#1B3D1A",
@@ -36,6 +53,7 @@ const LULC_COLORS = {
 export default function MapView({
   onSelectPolygon,
   poiSettings,
+  isAdminBoundariesVisible,
   isPOISectionVisible,
   isLULCSectionVisible,
   districts,
@@ -59,85 +77,89 @@ export default function MapView({
       id: "poi-anganwadi",
       data: anganwadi,
       setting: "anganwadi",
-      color: "#FF5733", // Kept same
+      color: "#FF5733",
     },
-    {
-      id: "poi-canal",
-      data: canal,
-      setting: "canal",
-      color: "#2ECC71", // Kept same
-    },
-    {
-      id: "poi-forest",
-      data: forest,
-      setting: "forest",
-      color: "#006400", // Kept same
-    },
+    { id: "poi-canal", data: canal, setting: "canal", color: "#2ECC71" },
+    { id: "poi-forest", data: forest, setting: "forest", color: "#006400" },
     {
       id: "poi-civilsupplies",
       data: civilSupplies,
       setting: "civilSupplies",
-      color: "#1E88E5", // Bright Blue
+      color: "#1E88E5",
     },
     {
       id: "poi-muncipalities",
       data: muncipality,
       setting: "muncipalities",
-      color: "#F9A825", // Yellowish Amber
+      color: "#F9A825",
     },
     {
       id: "poi-hospital",
       data: hospital,
       setting: "hospitals",
-      color: "#C62828", // Rich Red
+      color: "#C62828",
     },
     {
       id: "poi-archmuse",
       data: archMuse,
       setting: "archmuse",
-      color: "#6D4C41", // Brown (Soft contrast)
+      color: "#6D4C41",
     },
     {
       id: "poi-drainage",
       data: drainage,
       setting: "drainage",
-      color: "#039BE5", // Light Blue
+      color: "#039BE5",
     },
     {
       id: "poi-electricpoles",
       data: electricPoles,
       setting: "electricpoles",
-      color: "#F57C00", // Orange
+      color: "#F57C00",
     },
     {
       id: "poi-police",
       data: policeStation,
       setting: "policeSt",
-      color: "#5E35B1", // Deep Purple
+      color: "#5E35B1",
     },
     {
       id: "poi-polsur",
       data: policeSurveillance,
       setting: "policeSur",
-      color: "#00897B", // Teal
+      color: "#00897B",
     },
     {
       id: "poi-railway",
       data: RailwayNetwork,
       setting: "railway",
-      color: "#546E7A", // Blue Grey
+      color: "#546E7A",
+    },
+    { id: "poi-river", data: river, setting: "river", color: "#00ACC1" },
+    { id: "poi-roads", data: roads, setting: "roads", color: "#FF7043" },
+  ];
+
+  const BOUNDARY_LAYERS = [
+    {
+      id: "districts",
+      data: districts,
+      key: "district",
+      nameField: "NAME",
+      color: "#0a0a0a",
     },
     {
-      id: "poi-river",
-      data: river,
-      setting: "river",
-      color: "#00ACC1", // Cyan
+      id: "mandals",
+      data: mandals,
+      key: "mandal",
+      nameField: "sdtname",
+      color: "#DAA520",
     },
     {
-      id: "poi-roads",
-      data: roads,
-      setting: "roads",
-      color: "#FF7043", // Coral
+      id: "villages",
+      data: villages,
+      key: "village",
+      nameField: "NAME",
+      color: "#444444",
     },
   ];
 
@@ -154,8 +176,13 @@ export default function MapView({
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on("load", () => {
-      // === Parcel Layers
+      // === Parcels
       map.current.addSource("parcels", { type: "geojson", data: geojson });
+      map.current.addSource("highlight-parcel", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+
       map.current.addLayer({
         id: "parcels-fill",
         type: "fill",
@@ -184,11 +211,24 @@ export default function MapView({
           "text-halo-width": 1.2,
         },
       });
+      map.current.addLayer({
+        id: "highlight-parcel",
+        type: "line",
+        source: "highlight-parcel",
+        paint: { "line-color": "#FF0000", "line-width": 3 },
+      });
 
       map.current.on("click", "parcels-fill", (e) => {
         const feature = e.features[0];
         const area = turf.area(feature) * 0.000247105;
+
+        map.current.getSource("highlight-parcel").setData({
+          type: "FeatureCollection",
+          features: [feature],
+        });
+
         onSelectPolygon(feature.properties);
+
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
           .setHTML(
@@ -199,20 +239,26 @@ export default function MapView({
           .addTo(map.current);
       });
 
-      const addBoundary = (id, data, nameField, fillColor, lineColor) => {
-        map.current.addSource(id, { type: "geojson", data });
-        map.current.addLayer({
-          id: `${id}-fill`,
-          type: "fill",
-          source: id,
-          paint: { "fill-color": fillColor, "fill-opacity": 0.4 },
-          layout: { visibility: "none" },
+      map.current.on("click", (e) => {
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ["parcels-fill"],
         });
+        if (!features.length) {
+          map.current.getSource("highlight-parcel").setData({
+            type: "FeatureCollection",
+            features: [],
+          });
+        }
+      });
+
+      // === Boundaries
+      BOUNDARY_LAYERS.forEach(({ id, data, nameField, color }) => {
+        map.current.addSource(id, { type: "geojson", data });
         map.current.addLayer({
           id: `${id}-outline`,
           type: "line",
           source: id,
-          paint: { "line-color": lineColor, "line-width": 2 },
+          paint: { "line-color": color, "line-width": 2 },
           layout: { visibility: "none" },
         });
         map.current.addLayer({
@@ -231,13 +277,8 @@ export default function MapView({
             "text-halo-width": 1.2,
           },
         });
-      };
+      });
 
-      addBoundary("villages", villages, "NAME", "#ADD8E6", "#0a0a0a");
-      addBoundary("districts", districts, "NAME", "#ADD8E6", "#0a0a0a");
-      addBoundary("mandals", mandals, "sdtname", "#FFD700", "#DAA520");
-
-      // === Highlight Layers
       map.current.addSource("highlight-district", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -260,7 +301,7 @@ export default function MapView({
         paint: { "line-color": "red", "line-width": 3 },
       });
 
-      // === POI Layers
+      // === POIs
       POI_LAYERS.forEach(({ id, data, color }) => {
         map.current.addSource(id, { type: "geojson", data });
         const type = data.features[0]?.geometry?.type;
@@ -277,7 +318,7 @@ export default function MapView({
             },
             layout: { visibility: "none" },
           });
-        } else if (type === "MultiLineString" || type === "LineString") {
+        } else if (type === "LineString" || type === "MultiLineString") {
           map.current.addLayer({
             id,
             type: "line",
@@ -285,26 +326,19 @@ export default function MapView({
             paint: { "line-color": color, "line-width": 3 },
             layout: { visibility: "none" },
           });
-        } else if (type === "Polygon" || type === "MultiPolygon") {
+        } else {
           map.current.addLayer({
             id,
             type: "fill",
             source: id,
-            paint: {
-              "fill-color": color,
-              "fill-opacity": 0.6,
-            },
+            paint: { "fill-color": color, "fill-opacity": 0.6 },
             layout: { visibility: "none" },
           });
-          // optional outline
           map.current.addLayer({
             id: `${id}-outline`,
             type: "line",
             source: id,
-            paint: {
-              "line-color": color,
-              "line-width": 2,
-            },
+            paint: { "line-color": color, "line-width": 2 },
             layout: { visibility: "none" },
           });
         }
@@ -324,55 +358,42 @@ export default function MapView({
         });
       });
 
-      // === Draw Tool
-      draw.current = new MapboxDraw({
-        displayControlsDefault: false,
-        controls: {},
-        defaultMode: "simple_select",
-      });
+      draw.current = new MapboxDraw({ displayControlsDefault: false });
       map.current.addControl(draw.current);
-
-      // Automatically enter select mode after drawing
       map.current.on("draw.create", () => {
         draw.current.changeMode("simple_select");
       });
     });
   }, [districts, mandals, villages]);
 
-  // === Handle Layer Toggles
   useEffect(() => {
     if (!map.current) return;
 
-    const toggleLayers = (ids, key) => {
-      const visible = poiSettings[key] ? "visible" : "none";
-      ids.forEach((id) => {
-        if (map.current.getLayer(id)) {
-          map.current.setLayoutProperty(id, "visibility", visible);
-        }
-      });
-    };
-
-    toggleLayers(
-      ["districts-fill", "districts-outline", "districts-label"],
-      "district"
-    );
-    toggleLayers(
-      ["mandals-fill", "mandals-outline", "mandals-label"],
-      "mandal"
-    );
-    toggleLayers(
-      ["villages-fill", "villages-outline", "villages-label"],
-      "village"
-    );
-
-    POI_LAYERS.forEach(({ id, setting }) => {
-      const visible =
-        isPOISectionVisible && poiSettings[setting] ? "visible" : "none";
-      if (map.current.getLayer(id)) {
-        map.current.setLayoutProperty(id, "visibility", visible);
+    // Admin boundary layer toggles
+    BOUNDARY_LAYERS.forEach(({ id, key }) => {
+      const visibility = poiSettings[key] ? "visible" : "none";
+      if (map.current.getLayer(`${id}-outline`)) {
+        map.current.setLayoutProperty(
+          `${id}-outline`,
+          "visibility",
+          visibility
+        );
+      }
+      if (map.current.getLayer(`${id}-label`)) {
+        map.current.setLayoutProperty(`${id}-label`, "visibility", visibility);
       }
     });
 
+    // POI toggles
+    POI_LAYERS.forEach(({ id, setting }) => {
+      const visibility =
+        isPOISectionVisible && poiSettings[setting] ? "visible" : "none";
+      if (map.current.getLayer(id)) {
+        map.current.setLayoutProperty(id, "visibility", visibility);
+      }
+    });
+
+    // LULC toggles
     Object.keys(lulcToggles).forEach((category) => {
       const layerId = `lulc-${category.replace(/\s+/g, "-").toLowerCase()}`;
       const visibility =
@@ -381,9 +402,25 @@ export default function MapView({
         map.current.setLayoutProperty(layerId, "visibility", visibility);
       }
     });
+
+    // Zoom logic
+    const shouldZoomToState =
+      poiSettings.district || poiSettings.mandal || poiSettings.village;
+
+    if (shouldZoomToState) {
+      let features = [];
+      if (poiSettings.district) features = features.concat(districts.features);
+      if (poiSettings.mandal) features = features.concat(mandals.features);
+      if (poiSettings.village) features = features.concat(villages.features);
+      if (features.length) {
+        const stateBBox = bbox({ type: "FeatureCollection", features });
+        map.current.fitBounds(stateBBox, { padding: 40 });
+      }
+    } else {
+      map.current.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
+    }
   }, [poiSettings, isPOISectionVisible, lulcToggles, isLULCSectionVisible]);
 
-  // === Highlight and Zoom
   useEffect(() => {
     if (!map.current) return;
 
@@ -414,15 +451,10 @@ export default function MapView({
     } else if (mandalFeature) {
       map.current.fitBounds(turf.bbox(mandalFeature), { padding: 40 });
     } else {
-      map.current.flyTo({
-        center: DEFAULT_CENTER,
-        zoom: DEFAULT_ZOOM,
-        essential: true,
-      });
+      map.current.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
     }
   }, [highlightDistrict, highlightMandal]);
 
-  // === Toolbar Interactions
   useEffect(() => {
     if (!map.current || !draw.current) return;
 

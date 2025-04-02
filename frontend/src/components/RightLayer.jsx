@@ -21,6 +21,8 @@ const LULC_COLORS = {
 export default function RightLayer({
   settings,
   setSettings,
+  isAdminBoundariesVisible,
+  setIsAdminBoundariesVisible,
   isPOISectionVisible,
   setIsPOISectionVisible,
   districts,
@@ -359,12 +361,40 @@ export default function RightLayer({
       </div>
 
       <div className="section">
-        <h4 className="section-title">Administrative boundaries</h4>
-        <div className="toggle-group">
-          {renderToggle("District boundaries", "district")}
-          {renderToggle("Mandal boundaries", "mandal")}
-          {renderToggle("Village boundaries", "village")}
+        <div className="section-header">
+          <h4 className="section-title">Administrative Boundaries</h4>
+          <button
+            className={`toggle section-toggle ${
+              isAdminBoundariesVisible ? "toggle-active" : ""
+            }`}
+            onClick={() => {
+              setIsAdminBoundariesVisible((prev) => {
+                const newValue = !prev;
+                if (!newValue) {
+                  setSettings((prevSettings) => ({
+                    ...prevSettings,
+                    district: false,
+                    mandal: false,
+                    village: false,
+                  }));
+                }
+                return newValue;
+              });
+            }}
+            aria-checked={isAdminBoundariesVisible}
+            role="switch"
+          >
+            <span className="toggle-thumb"></span>
+          </button>
         </div>
+
+        {isAdminBoundariesVisible && (
+          <div className="toggle-group">
+            {renderToggle("District boundaries", "district")}
+            {renderToggle("Mandal boundaries", "mandal")}
+            {renderToggle("Village boundaries", "village")}
+          </div>
+        )}
       </div>
 
       <div className="section">
