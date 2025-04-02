@@ -11,6 +11,8 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 
 export default function HomePage({ onLogout }) {
   const [selectedFeature, setSelectedFeature] = useState(null);
+  const [isAdminBoundariesVisible, setIsAdminBoundariesVisible] =
+    useState(false);
   const [isPOISectionVisible, setIsPOISectionVisible] = useState(false);
   const [isLULCSectionVisible, setIsLULCSectionVisible] = useState(false);
   const [districts, setDistricts] = useState(null);
@@ -94,6 +96,7 @@ export default function HomePage({ onLogout }) {
         <MapView
           onSelectPolygon={(props) => setSelectedFeature(props)}
           poiSettings={poiSettings}
+          isAdminBoundariesVisible={isAdminBoundariesVisible}
           isPOISectionVisible={isPOISectionVisible}
           isLULCSectionVisible={isLULCSectionVisible}
           districts={districts}
@@ -110,6 +113,8 @@ export default function HomePage({ onLogout }) {
           settings={poiSettings}
           setSettings={setPoiSettings}
           isPOISectionVisible={isPOISectionVisible}
+          isAdminBoundariesVisible={isAdminBoundariesVisible}
+          setIsAdminBoundariesVisible={setIsAdminBoundariesVisible}
           setIsPOISectionVisible={setIsPOISectionVisible}
           lulcToggles={lulcToggles}
           setLulcToggles={setLulcToggles}
