@@ -1,5 +1,5 @@
 .layers-panel {
-  position: absolute;
+  /* position: fixed; */
   top: 16px;
   left: 0px;
   width: 320px;
@@ -23,21 +23,21 @@
   margin: 0 0 16px 0;
 }
 
-.section {
+/* .section {
 
   margin-bottom: 20px;
-}
+} */
 
 .section-title {
   padding-left: 10px;
   font-size: 16px;
   font-weight: 600;
-  color: #4a5568;
+  /* color: #4a5568; */
 
 }
 
 .section-header {
-  display: flex;
+  /* display: flex; */
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
@@ -47,7 +47,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 6px;
+  margin-top: 30px;
 }
 
 .toggle-container {
