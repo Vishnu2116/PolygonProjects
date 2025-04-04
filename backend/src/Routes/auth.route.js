@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "your-super-secret";
-const USERS = [{ username: "admin", password: "AdminDemo@1234" }];
+const USERS = [{ username: "admin", password: "admin1" }];
 
 router.post("/api/login", (req, res) => {
   const { username, password } = req.body;

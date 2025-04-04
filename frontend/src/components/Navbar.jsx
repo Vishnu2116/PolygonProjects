@@ -14,7 +14,7 @@ export default function Navbar({ onLogout }) {
           <img src={emblemlogo} alt="Emblem" />
         </div>
         <div className="andr">
-          <h1>Land Information System</h1>
+          <h1>Parcel Information System</h1>
           <h4 align="center">Andhra Pradesh</h4>
         </div>
         <button onClick={handleLogout}>Logout</button>
