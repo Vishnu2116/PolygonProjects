@@ -537,13 +537,6 @@ export default function MapView({
         topographyVisible ? "visible" : "none"
       );
     }
-    if (map.current.getLayer("fmb137-layer")) {
-      map.current.setLayoutProperty(
-        "fmb137-layer",
-        "visibility",
-        showFmbLayer ? "visible" : "none"
-      );
-    }
   }, [
     poiSettings,
     isPOISectionVisible,
@@ -555,9 +548,20 @@ export default function MapView({
     mandals,
     villages,
     topographyVisible,
-    showFmbLayer,
     cadastralVisible,
   ]);
+
+  useEffect(() => {
+    if (!map.current) return;
+
+    if (map.current.getLayer("fmb137-layer")) {
+      map.current.setLayoutProperty(
+        "fmb137-layer",
+        "visibility",
+        showFmbLayer ? "visible" : "none"
+      );
+    }
+  }, [showFmbLayer]);
 
   useEffect(() => {
     if (!map.current) return;
