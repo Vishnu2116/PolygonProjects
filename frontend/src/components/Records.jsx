@@ -89,7 +89,7 @@ const RecordDetails = ({
           {data?.Parcel_num && (
             <>
               <div className="record-item">
-                <div className="item-label">Adangal</div>
+                <div className="item-label">FMB SKETCH</div>
                 <div
                   className="item-value"
                   style={{ display: "flex", gap: "10px", alignItems: "center" }}
@@ -122,6 +122,28 @@ const RecordDetails = ({
                   {String(data.Parcel_num).trim() === "137" ? (
                     <a
                       href="/pdfs/137_EC.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: "#007bff",
+                        textDecoration: "underline",
+                        fontSize: "14px",
+                      }}
+                    >
+                      PDF
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </div>
+              </div>
+
+              <div className="record-item">
+                <div className="item-label">ADANGAL</div>
+                <div className="item-value">
+                  {String(data.Parcel_num).trim() === "137" ? (
+                    <a
+                      href="/pdfs/137_1A.pdf"
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{

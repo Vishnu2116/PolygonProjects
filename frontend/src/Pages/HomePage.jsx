@@ -26,7 +26,7 @@ export default function HomePage({ onLogout }) {
   const [activeTool, setActiveTool] = useState(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [topographyVisible, setTopographyVisible] = useState(false);
-  const [cadastralVisible, setCadastralVisible] = useState(false);
+  const [cadastralVisible, setCadastralVisible] = useState(true);
 
   const [adminSettings, setAdminSettings] = useState({
     district: false,
@@ -80,6 +80,28 @@ export default function HomePage({ onLogout }) {
     };
     loadGeoJSON();
   }, []);
+
+  useEffect(() => {
+    if (!cadastralVisible) {
+      setSelectedFeature(null); // hide record panel
+      setShowFmbLayer(false); // hide FMB
+
+      // Remove parcel highlight
+      if (window.__MAP__) {
+        const map = window.__MAP__;
+        const source = map.getSource("highlight-parcel");
+        if (source) {
+          source.setData({ type: "FeatureCollection", features: [] });
+        }
+
+        // ✅ Close any popup
+        const popups = document.getElementsByClassName("mapboxgl-popup");
+        for (let popup of popups) {
+          popup.remove();
+        }
+      }
+    }
+  }, [cadastralVisible]);
 
   return (
     <div className="app-container">

@@ -205,7 +205,7 @@ export default function MapView({
         url: "mapbox://rayapati49.0f2xgztl", // ✅ Use your actual tileset ID here
         tileSize: 256,
         minzoom: 10, // set based on your tileset
-        maxzoom: 15,
+        maxzoom: 22,
       });
 
       // === Parcels
@@ -398,6 +398,15 @@ export default function MapView({
           });
         }
       });
+      if (cadastralVisible) {
+        map.current.setLayoutProperty("parcels-fill", "visibility", "visible");
+        map.current.setLayoutProperty(
+          "parcels-outline",
+          "visibility",
+          "visible"
+        );
+        map.current.setLayoutProperty("parcels-label", "visibility", "visible");
+      }
 
       map.current.addLayer(
         {
