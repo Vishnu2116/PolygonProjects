@@ -26,6 +26,7 @@ export default function HomePage({ onLogout }) {
   const [activeTool, setActiveTool] = useState(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [topographyVisible, setTopographyVisible] = useState(false);
+  const [cadastralVisible, setCadastralVisible] = useState(false);
 
   const [adminSettings, setAdminSettings] = useState({
     district: false,
@@ -116,6 +117,7 @@ export default function HomePage({ onLogout }) {
           lulcToggles={lulcToggles}
           activeTool={activeTool}
           showFmbLayer={showFmbLayer}
+          cadastralVisible={cadastralVisible}
         />
 
         <RightLayer
@@ -133,6 +135,8 @@ export default function HomePage({ onLogout }) {
           topographyVisible={topographyVisible}
           setTopographyVisible={setTopographyVisible}
           setIsLULCSectionVisible={setIsLULCSectionVisible}
+          cadastralVisible={cadastralVisible} // ✅ Add this
+          setCadastralVisible={setCadastralVisible}
         />
 
         <div className="controls-container">

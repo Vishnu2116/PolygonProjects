@@ -69,6 +69,7 @@ export default function MapView({
   activeTool,
   topographyVisible,
   showFmbLayer,
+  cadastralVisible,
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -206,17 +207,6 @@ export default function MapView({
         minzoom: 10, // set based on your tileset
         maxzoom: 15,
       });
-      map.current.addLayer(
-        {
-          id: "fmb137-layer",
-          type: "raster",
-          source: "fmb137",
-          layout: {
-            visibility: "none",
-          },
-        }
-        // Insert it below parcels
-      );
 
       // === Parcels
       map.current.addSource("parcels", { type: "geojson", data: geojson });
@@ -230,13 +220,16 @@ export default function MapView({
         type: "fill",
         source: "parcels",
         paint: { "fill-color": "#0080ff", "fill-opacity": 0.3 },
+        layout: { visibility: "none" }, // start hidden, controlled by toggle
       });
+
       map.current.addLayer({
         id: "parcels-outline",
         type: "line",
         source: "parcels",
         paint: { "line-color": "#003366", "line-width": 1.2 },
       });
+
       map.current.addLayer({
         id: "parcels-label",
         type: "symbol",
@@ -253,6 +246,7 @@ export default function MapView({
           "text-halo-width": 1.2,
         },
       });
+
       map.current.addLayer({
         id: "highlight-parcel",
         type: "line",
@@ -260,6 +254,7 @@ export default function MapView({
         paint: { "line-color": "#FF0000", "line-width": 3 },
       });
 
+      // ✅ Parcel click logic (no PDF opening)
       map.current.on("click", "parcels-fill", (e) => {
         const feature = e.features[0];
         const area = turf.area(feature) * 0.000247105;
@@ -268,11 +263,8 @@ export default function MapView({
           type: "FeatureCollection",
           features: [feature],
         });
-        if (String(feature.properties.Parcel_num).trim() === "137") {
-          window.open("/pdfs/parcel137.pdf", "_blank"); // 👈 PDF must be in `public/pdfs/`
-        }
-        console.log({ ...feature.properties });
 
+        console.log({ ...feature.properties });
         onSelectPolygon({ ...feature.properties });
 
         new mapboxgl.Popup()
@@ -404,6 +396,17 @@ export default function MapView({
         }
       });
 
+      map.current.addLayer(
+        {
+          id: "fmb137-layer",
+          type: "raster",
+          source: "fmb137",
+          layout: { visibility: "none" },
+        },
+        map.current.getStyle().layers[map.current.getStyle().layers.length - 1]
+          ?.id // on top
+      );
+
       // === LULC
       map.current.addSource("lulc", { type: "geojson", data: geojson });
       Object.entries(LULC_COLORS).forEach(([category, color]) => {
@@ -424,10 +427,17 @@ export default function MapView({
         draw.current.changeMode("simple_select");
       });
     });
-  }, [districts, mandals, villages]);
+  }, [districts, mandals, villages, cadastralVisible]);
 
   useEffect(() => {
     if (!map.current) return;
+    if (map.current.getLayer("parcels-fill")) {
+      map.current.setLayoutProperty(
+        "parcels-fill",
+        "visibility",
+        cadastralVisible ? "visible" : "none"
+      );
+    }
 
     // === Admin boundary layer visibility
     BOUNDARY_LAYERS.forEach(({ id, key }) => {
@@ -529,6 +539,7 @@ export default function MapView({
     villages,
     topographyVisible,
     showFmbLayer,
+    cadastralVisible,
   ]);
 
   useEffect(() => {

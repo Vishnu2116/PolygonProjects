@@ -5,6 +5,7 @@ import AdministrativeBoundaries from "./AdministrativeBoundaries";
 import Topography from "./Topography";
 import PointsofInterest from "./PointsofInterest";
 import Lulc from "./Lulc";
+import Cadastral from "./Cadastral";
 
 export default function RightLayer({
   settings,
@@ -21,6 +22,8 @@ export default function RightLayer({
   setIsLULCSectionVisible,
   topographyVisible,
   setTopographyVisible,
+  cadastralVisible,
+  setCadastralVisible,
 }) {
   const lulcCategories = useMemo(() => {
     return [
@@ -89,6 +92,10 @@ export default function RightLayer({
         isLULCSectionVisible={isLULCSectionVisible}
         setIsLULCSectionVisible={setIsLULCSectionVisible}
         lulcCategories={lulcCategories}
+      />
+      <Cadastral
+        cadastralVisible={cadastralVisible}
+        setCadastralVisible={setCadastralVisible}
       />
 
       <Topography
