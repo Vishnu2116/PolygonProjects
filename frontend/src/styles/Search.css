@@ -13,7 +13,11 @@
   display: flex;
   flex-direction: column;
 }
-
+.warning-text {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
 /* New header styling for dropdown */
 .search-header {
   display: flex;
@@ -26,8 +30,8 @@
   transition: background-color 0.2s ease;
 }
 
-.pdd__{
-    padding-bottom:40px;
+.pdd__ {
+  padding-bottom: 40px;
 }
 .search-header:hover {
   background-color: #f1f5f9;

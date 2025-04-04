@@ -2,12 +2,15 @@ import React, { useMemo, useEffect, useCallback } from "react";
 import LULC from "../../assets/LULC";
 import "../../styles/Layers.css";
 import AdministrativeBoundaries from "./AdministrativeBoundaries";
+import Topography from "./Topography";
 import PointsofInterest from "./PointsofInterest";
 import Lulc from "./Lulc";
 
 export default function RightLayer({
   settings,
   setSettings,
+  adminSettings,
+  setAdminSettings,
   isAdminBoundariesVisible,
   setIsAdminBoundariesVisible,
   isPOISectionVisible,
@@ -16,6 +19,8 @@ export default function RightLayer({
   setLulcToggles,
   isLULCSectionVisible,
   setIsLULCSectionVisible,
+  topographyVisible,
+  setTopographyVisible,
 }) {
   const lulcCategories = useMemo(() => {
     return [
@@ -56,14 +61,25 @@ export default function RightLayer({
     <div className="layers-panel">
       <h3 className="panel-title">Layers</h3>
       <AdministrativeBoundaries
-        settings={settings}
-        toggleSetting={toggleSetting}
+        settings={adminSettings} // ✅ use correct state
+        toggleSetting={(key) =>
+          setAdminSettings((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+          }))
+        }
+        setSettings={setAdminSettings}
         isAdminBoundariesVisible={isAdminBoundariesVisible}
         setIsAdminBoundariesVisible={setIsAdminBoundariesVisible}
       />
       <PointsofInterest
-        settings={settings}
-        toggleSetting={toggleSetting}
+        settings={settings} // poiSettings
+        toggleSetting={(key) =>
+          setSettings((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+          }))
+        }
         isPOISectionVisible={isPOISectionVisible}
         setIsPOISectionVisible={setIsPOISectionVisible}
       />
@@ -73,6 +89,11 @@ export default function RightLayer({
         isLULCSectionVisible={isLULCSectionVisible}
         setIsLULCSectionVisible={setIsLULCSectionVisible}
         lulcCategories={lulcCategories}
+      />
+
+      <Topography
+        topographyVisible={topographyVisible}
+        setTopographyVisible={setTopographyVisible}
       />
     </div>
   );

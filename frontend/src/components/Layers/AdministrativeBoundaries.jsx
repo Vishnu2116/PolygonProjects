@@ -1,12 +1,15 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import "../../styles/Layers.css";
 
 export default function AdministrativeBoundaries({
   settings,
   toggleSetting,
+  setSettings,
   isAdminBoundariesVisible,
   setIsAdminBoundariesVisible,
 }) {
+  const previousSettingsRef = useRef(settings); // Stores last ON settings
+
   const renderToggle = useCallback(
     (label, key) => (
       <div className="toggle-container" key={key}>
@@ -24,6 +27,25 @@ export default function AdministrativeBoundaries({
     [settings, toggleSetting]
   );
 
+  const handleMainToggle = () => {
+    const newValue = !isAdminBoundariesVisible;
+    setIsAdminBoundariesVisible(newValue);
+
+    if (!newValue) {
+      // Store current state before turning off
+      previousSettingsRef.current = { ...settings };
+      // Turn everything off
+      setSettings({
+        district: false,
+        mandal: false,
+        village: false,
+      });
+    } else {
+      // Restore previous state
+      setSettings(previousSettingsRef.current);
+    }
+  };
+
   return (
     <div className="section">
       <div className="section-header">
@@ -32,17 +54,7 @@ export default function AdministrativeBoundaries({
           className={`toggle section-toggle ${
             isAdminBoundariesVisible ? "toggle-active" : ""
           }`}
-          onClick={() => {
-            setIsAdminBoundariesVisible((prev) => {
-              const newValue = !prev;
-              if (!newValue) {
-                toggleSetting("district");
-                toggleSetting("mandal");
-                toggleSetting("village");
-              }
-              return newValue;
-            });
-          }}
+          onClick={handleMainToggle}
           aria-checked={isAdminBoundariesVisible}
           role="switch"
         >

@@ -14,6 +14,7 @@ export default function HomePage({ onLogout }) {
   const [isAdminBoundariesVisible, setIsAdminBoundariesVisible] =
     useState(false);
   const [isPOISectionVisible, setIsPOISectionVisible] = useState(false);
+  const [showFmbLayer, setShowFmbLayer] = useState(false);
   const [isLULCSectionVisible, setIsLULCSectionVisible] = useState(false);
   const [districts, setDistricts] = useState(null);
   const [mandals, setMandals] = useState(null);
@@ -24,11 +25,14 @@ export default function HomePage({ onLogout }) {
   const [lulcToggles, setLulcToggles] = useState({});
   const [activeTool, setActiveTool] = useState(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [topographyVisible, setTopographyVisible] = useState(false);
 
-  const [poiSettings, setPoiSettings] = useState({
+  const [adminSettings, setAdminSettings] = useState({
     district: false,
     mandal: false,
     village: false,
+  });
+  const [poiSettings, setPoiSettings] = useState({
     anganwadi: false,
     canal: false,
     forest: false,
@@ -88,6 +92,8 @@ export default function HomePage({ onLogout }) {
             <RecordDetails
               data={selectedFeature}
               isSearchExpanded={isSearchExpanded}
+              showFmbLayer={showFmbLayer}
+              setShowFmbLayer={setShowFmbLayer}
               onClose={() => setSelectedFeature(null)}
             />
           )}
@@ -95,10 +101,12 @@ export default function HomePage({ onLogout }) {
 
         <MapView
           onSelectPolygon={(props) => setSelectedFeature(props)}
+          adminSettings={adminSettings}
           poiSettings={poiSettings}
           isAdminBoundariesVisible={isAdminBoundariesVisible}
           isPOISectionVisible={isPOISectionVisible}
           isLULCSectionVisible={isLULCSectionVisible}
+          topographyVisible={topographyVisible}
           districts={districts}
           mandals={mandals}
           villages={villages}
@@ -107,18 +115,23 @@ export default function HomePage({ onLogout }) {
           highlightVillage={highlightVillage}
           lulcToggles={lulcToggles}
           activeTool={activeTool}
+          showFmbLayer={showFmbLayer}
         />
 
         <RightLayer
           settings={poiSettings}
           setSettings={setPoiSettings}
           isPOISectionVisible={isPOISectionVisible}
+          setIsPOISectionVisible={setIsPOISectionVisible}
           isAdminBoundariesVisible={isAdminBoundariesVisible}
           setIsAdminBoundariesVisible={setIsAdminBoundariesVisible}
-          setIsPOISectionVisible={setIsPOISectionVisible}
+          adminSettings={adminSettings} // ✅ Add
+          setAdminSettings={setAdminSettings} // ✅ Add
           lulcToggles={lulcToggles}
           setLulcToggles={setLulcToggles}
           isLULCSectionVisible={isLULCSectionVisible}
+          topographyVisible={topographyVisible}
+          setTopographyVisible={setTopographyVisible}
           setIsLULCSectionVisible={setIsLULCSectionVisible}
         />
 

@@ -25,21 +25,23 @@ import roads from "../assets/pois/Roads.js";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmF5YXBhdGk0OSIsImEiOiJjbGVvMWp6OGIwajFpM3luNTBqZHhweXZzIn0.1r2DoIQ1Gf2K3e5WBgDNjA";
 
-const seenParcels = new Set();
-const uniqueFeatures = [];
-
-for (const feature of geojson.features) {
-  const parcelNum = String(feature.properties?.Parcel_num || "").trim();
-  if (parcelNum && !seenParcels.has(parcelNum)) {
-    seenParcels.add(parcelNum);
-    uniqueFeatures.push(feature);
-  }
-}
-
-const deduplicatedGeoJSON = {
-  ...geojson,
-  features: uniqueFeatures,
-};
+const allKeys = [
+  "fid",
+  "Remarks",
+  "V_Name",
+  "M_Name",
+  "D_Name",
+  "DMV_Code",
+  "Parcel_num",
+  "Shape_Leng",
+  "Shape_Area",
+  "Project",
+  "AWC_Name",
+  "Name",
+  "Locality",
+  "Status",
+  "LULC_1",
+];
 
 const LULC_COLORS = {
   "Agriculture Land": "#1B5E20",
@@ -53,6 +55,7 @@ const LULC_COLORS = {
 export default function MapView({
   onSelectPolygon,
   poiSettings,
+  adminSettings,
   isAdminBoundariesVisible,
   isPOISectionVisible,
   isLULCSectionVisible,
@@ -64,6 +67,8 @@ export default function MapView({
   highlightVillage,
   lulcToggles,
   activeTool,
+  topographyVisible,
+  showFmbLayer,
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -172,10 +177,47 @@ export default function MapView({
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
     });
+    window.__MAP__ = map.current;
 
     map.current.addControl(new mapboxgl.NavigationControl());
 
     map.current.on("load", () => {
+      //topography layer
+      map.current.addSource("topography", {
+        type: "raster",
+        url: "mapbox://rayapati49.bkzen9ha",
+        tileSize: 256,
+        minzoom: 5,
+        maxzoom: 15, // Adjust based on your MBTiles max zoom
+      });
+
+      map.current.addLayer({
+        id: "topography-layer",
+        type: "raster",
+        source: "topography",
+        layout: { visibility: topographyVisible ? "visible" : "none" },
+      });
+
+      //fmblayer
+      map.current.addSource("fmb137", {
+        type: "raster",
+        url: "mapbox://rayapati49.0f2xgztl", // ✅ Use your actual tileset ID here
+        tileSize: 256,
+        minzoom: 10, // set based on your tileset
+        maxzoom: 15,
+      });
+      map.current.addLayer(
+        {
+          id: "fmb137-layer",
+          type: "raster",
+          source: "fmb137",
+          layout: {
+            visibility: "none",
+          },
+        }
+        // Insert it below parcels
+      );
+
       // === Parcels
       map.current.addSource("parcels", { type: "geojson", data: geojson });
       map.current.addSource("highlight-parcel", {
@@ -226,8 +268,12 @@ export default function MapView({
           type: "FeatureCollection",
           features: [feature],
         });
+        if (String(feature.properties.Parcel_num).trim() === "137") {
+          window.open("/pdfs/parcel137.pdf", "_blank"); // 👈 PDF must be in `public/pdfs/`
+        }
+        console.log({ ...feature.properties });
 
-        onSelectPolygon(feature.properties);
+        onSelectPolygon({ ...feature.properties });
 
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
@@ -279,6 +325,8 @@ export default function MapView({
         });
       });
 
+      //search box highlight
+
       map.current.addSource("highlight-district", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -299,6 +347,18 @@ export default function MapView({
         type: "line",
         source: "highlight-mandal",
         paint: { "line-color": "red", "line-width": 3 },
+      });
+
+      map.current.addSource("highlight-village", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+
+      map.current.addLayer({
+        id: "highlight-village",
+        type: "line",
+        source: "highlight-village",
+        paint: { "line-color": "#000000", "line-width": 3 },
       });
 
       // === POIs
@@ -369,27 +429,35 @@ export default function MapView({
   useEffect(() => {
     if (!map.current) return;
 
-    // Admin boundary layer toggles
+    // === Admin boundary layer visibility
     BOUNDARY_LAYERS.forEach(({ id, key }) => {
-      const visibility = poiSettings[key] ? "visible" : "none";
+      const outlineLayer = `${id}-outline`;
+      const labelLayer = `${id}-label`;
+
+      if (
+        map.current.getLayer(outlineLayer) &&
+        map.current.getLayer(labelLayer)
+      ) {
+        const visibility =
+          isAdminBoundariesVisible && adminSettings[key] ? "visible" : "none";
+        map.current.setLayoutProperty(outlineLayer, "visibility", visibility);
+        map.current.setLayoutProperty(labelLayer, "visibility", visibility);
+      }
+    });
+
+    // === POI layer visibility
+    POI_LAYERS.forEach(({ id, setting }) => {
+      const visibility =
+        isPOISectionVisible && poiSettings[setting] ? "visible" : "none";
+      if (map.current.getLayer(id)) {
+        map.current.setLayoutProperty(id, "visibility", visibility);
+      }
       if (map.current.getLayer(`${id}-outline`)) {
         map.current.setLayoutProperty(
           `${id}-outline`,
           "visibility",
           visibility
         );
-      }
-      if (map.current.getLayer(`${id}-label`)) {
-        map.current.setLayoutProperty(`${id}-label`, "visibility", visibility);
-      }
-    });
-
-    // POI toggles
-    POI_LAYERS.forEach(({ id, setting }) => {
-      const visibility =
-        isPOISectionVisible && poiSettings[setting] ? "visible" : "none";
-      if (map.current.getLayer(id)) {
-        map.current.setLayoutProperty(id, "visibility", visibility);
       }
     });
 
@@ -404,14 +472,29 @@ export default function MapView({
     });
 
     // Zoom logic
+
     const shouldZoomToState =
-      poiSettings.district || poiSettings.mandal || poiSettings.village;
+      isAdminBoundariesVisible &&
+      (adminSettings.district || adminSettings.mandal || adminSettings.village);
+    // console.log("adminSettings:", adminSettings);
+    // console.log("villages.features:", villages?.features?.length);
+    // console.log("Sample village:", villages.features?.[0]);
 
     if (shouldZoomToState) {
       let features = [];
-      if (poiSettings.district) features = features.concat(districts.features);
-      if (poiSettings.mandal) features = features.concat(mandals.features);
-      if (poiSettings.village) features = features.concat(villages.features);
+      if (adminSettings.district)
+        features = features.concat(districts.features);
+      if (adminSettings.mandal) features = features.concat(mandals.features);
+      if (adminSettings.village) {
+        if (villages?.features?.length) {
+          const villageBBox = bbox({
+            type: "FeatureCollection",
+            features: villages.features,
+          });
+          map.current.fitBounds(villageBBox, { padding: 40 });
+        }
+      }
+
       if (features.length) {
         const stateBBox = bbox({ type: "FeatureCollection", features });
         map.current.fitBounds(stateBBox, { padding: 40 });
@@ -419,7 +502,34 @@ export default function MapView({
     } else {
       map.current.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
     }
-  }, [poiSettings, isPOISectionVisible, lulcToggles, isLULCSectionVisible]);
+
+    if (map.current.getLayer("topography-layer")) {
+      map.current.setLayoutProperty(
+        "topography-layer",
+        "visibility",
+        topographyVisible ? "visible" : "none"
+      );
+    }
+    if (map.current.getLayer("fmb137-layer")) {
+      map.current.setLayoutProperty(
+        "fmb137-layer",
+        "visibility",
+        showFmbLayer ? "visible" : "none"
+      );
+    }
+  }, [
+    poiSettings,
+    isPOISectionVisible,
+    adminSettings, // ✅ add this
+    isAdminBoundariesVisible, // ✅ add this
+    lulcToggles,
+    isLULCSectionVisible,
+    districts,
+    mandals,
+    villages,
+    topographyVisible,
+    showFmbLayer,
+  ]);
 
   useEffect(() => {
     if (!map.current) return;
@@ -431,6 +541,7 @@ export default function MapView({
 
     const districtFeature = findFeature(districts, highlightDistrict, "NAME");
     const mandalFeature = findFeature(mandals, highlightMandal, "sdtname");
+    const villageFeature = findFeature(villages, highlightVillage, "Village");
 
     if (map.current.getSource("highlight-district")) {
       map.current.getSource("highlight-district").setData({
@@ -446,40 +557,70 @@ export default function MapView({
       });
     }
 
-    if (districtFeature) {
-      map.current.fitBounds(turf.bbox(districtFeature), { padding: 40 });
+    if (map.current.getSource("highlight-village")) {
+      map.current.getSource("highlight-village").setData({
+        type: "FeatureCollection",
+        features: villageFeature ? [villageFeature] : [],
+      });
+    }
+
+    if (villageFeature) {
+      map.current.fitBounds(turf.bbox(villageFeature), { padding: 40 });
     } else if (mandalFeature) {
       map.current.fitBounds(turf.bbox(mandalFeature), { padding: 40 });
+    } else if (districtFeature) {
+      map.current.fitBounds(turf.bbox(districtFeature), { padding: 40 });
     } else {
       map.current.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
     }
-  }, [highlightDistrict, highlightMandal]);
+  }, [highlightDistrict, highlightMandal, highlightVillage]);
 
   useEffect(() => {
     if (!map.current || !draw.current) return;
 
-    switch (activeTool) {
-      case "print":
-        window.print();
-        break;
-      case "pan":
-        map.current.boxZoom.enable();
-        draw.current.changeMode("simple_select");
-        break;
-      case "line":
-        draw.current.changeMode("draw_line_string");
-        break;
-      case "polygon":
-        draw.current.changeMode("draw_polygon");
-        break;
-      case "search":
-        console.log("Search tool activated");
-        break;
-      default:
-        draw.current.changeMode("simple_select");
-        break;
+    // 🧼 Always reset mode before switching
+    const drawMode =
+      activeTool === "line"
+        ? "draw_line_string"
+        : activeTool === "polygon"
+        ? "draw_polygon"
+        : "simple_select";
+
+    const currentMode = draw.current.getMode();
+
+    // 🧠 Always reset before applying tool (even if it’s already selected)
+    if (currentMode !== drawMode) {
+      draw.current.changeMode("simple_select"); // reset everything
+      setTimeout(() => {
+        draw.current.changeMode(drawMode);
+      }, 50);
+    }
+
+    // ✅ Other tools
+    if (activeTool === "print") {
+      window.print();
+    } else if (activeTool === "pan") {
+      map.current.boxZoom.enable();
+      draw.current.changeMode("simple_select");
+    } else if (activeTool === "search") {
+      console.log("Search tool activated");
+      draw.current.changeMode("simple_select");
     }
   }, [activeTool]);
+
+  useEffect(() => {
+    if (!map.current) return;
+
+    if (adminSettings.village) {
+      if (villages?.features?.length) {
+        const villageBBox = bbox({
+          type: "FeatureCollection",
+          features: villages.features,
+        });
+        map.current.fitBounds(villageBBox, { padding: 40 });
+      }
+    }
+  }, [adminSettings.village]);
 
   return <div ref={mapContainer} className="map-container" />;
 }

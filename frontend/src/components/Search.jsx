@@ -10,6 +10,9 @@ export default function Search({
   onHighlightVillage,
   onToggle,
 }) {
+  const [mandalWarning, setMandalWarning] = useState(false);
+  const [villageWarning, setVillageWarning] = useState(false);
+
   const districtDropdownRef = useRef(null);
   const mandalDropdownRef = useRef(null);
   const villageDropdownRef = useRef(null);
@@ -189,6 +192,8 @@ export default function Search({
     setDistrictSearchTerm(district);
     setSelectedMandal("");
     setSelectedVillage("");
+    setMandalWarning(false); // <-- Add this line
+
     setShowDistrictDropdown(false);
     if (onHighlightDistrict) onHighlightDistrict(district);
     if (onHighlightMandal) onHighlightMandal("");
@@ -201,6 +206,8 @@ export default function Search({
     setSelectedDistrict(mandal.district);
     setDistrictSearchTerm(mandal.district);
     setSelectedVillage("");
+    setMandalWarning(false); // <-- Add this line
+
     setShowMandalDropdown(false);
     if (onHighlightMandal) onHighlightMandal(mandal.name);
     if (onHighlightDistrict) onHighlightDistrict(mandal.district);
@@ -214,6 +221,8 @@ export default function Search({
     setMandalSearchTerm(village.mandal);
     setSelectedDistrict(village.district);
     setDistrictSearchTerm(village.district);
+    setMandalWarning(false); // <-- Add this line
+    setVillageWarning(false);
     setShowVillageDropdown(false);
     if (onHighlightVillage) onHighlightVillage(village.name);
     if (onHighlightMandal) onHighlightMandal(village.mandal);
@@ -356,13 +365,25 @@ export default function Search({
                 onChange={(e) => {
                   const val = e.target.value;
                   setMandalSearchTerm(val);
+                  setMandalWarning(false); // Clear warning on typing
+                  if (!selectedDistrict) {
+                    setShowMandalDropdown(false);
+                    return;
+                  }
                   setShowMandalDropdown(true);
                   if (val.trim() === "") {
                     setSelectedMandal("");
                     if (onHighlightMandal) onHighlightMandal("");
                   }
                 }}
-                onClick={() => setShowMandalDropdown(true)}
+                onClick={() => {
+                  if (!selectedDistrict) {
+                    setMandalWarning(true);
+                    setShowMandalDropdown(false);
+                  } else {
+                    setShowMandalDropdown(true);
+                  }
+                }}
               />
               {mandalSearchTerm && (
                 <button
@@ -376,6 +397,11 @@ export default function Search({
                 >
                   ✕
                 </button>
+              )}
+              {mandalWarning && (
+                <div className="warning-text">
+                  Please select a district first
+                </div>
               )}
               {showMandalDropdown && filteredMandals.length > 0 && (
                 <div className="dropdown-wrapper dropdown-no-height">
@@ -396,13 +422,25 @@ export default function Search({
                 onChange={(e) => {
                   const val = e.target.value;
                   setVillageSearchTerm(val);
+                  setVillageWarning(false); // Clear warning on typing
+                  if (!selectedMandal) {
+                    setShowVillageDropdown(false);
+                    return;
+                  }
                   setShowVillageDropdown(true);
                   if (val.trim() === "") {
                     setSelectedVillage("");
                     if (onHighlightVillage) onHighlightVillage("");
                   }
                 }}
-                onClick={() => setShowVillageDropdown(true)}
+                onClick={() => {
+                  if (!selectedMandal) {
+                    setVillageWarning(true);
+                    setShowVillageDropdown(false);
+                  } else {
+                    setShowVillageDropdown(true);
+                  }
+                }}
               />
               {villageSearchTerm && (
                 <button
@@ -416,6 +454,9 @@ export default function Search({
                 >
                   ✕
                 </button>
+              )}
+              {villageWarning && (
+                <div className="warning-text">Please select a mandal first</div>
               )}
               {showVillageDropdown && filteredVillages.length > 0 && (
                 <div className="dropdown-wrapper dropdown-no-height">
