@@ -40,7 +40,7 @@ export default function LoginPage({ onLogin }) {
       </div>
       <div className="right">
         <div className="title">
-          <h1>Land Information Project</h1>
+          <h1>Parcel Information Project</h1>
         </div>
         <form
           onSubmit={handleSubmit}
