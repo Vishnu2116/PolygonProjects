@@ -121,7 +121,7 @@ const RecordDetails = ({
                 <div className="item-value">
                   {String(data.Parcel_num).trim() === "137" ? (
                     <a
-                      href="/pdfs/parcel137.pdf"
+                      href="/pdfs/137_EC.pdf"
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
