@@ -87,33 +87,57 @@ const RecordDetails = ({
 
           {/* ✅ Always show Adangal toggle at the end if Parcel is present */}
           {data?.Parcel_num && (
-            <div className="record-item">
-              <div className="item-label">Adangal</div>
-              <div
-                className="item-value"
-                style={{ display: "flex", gap: "10px", alignItems: "center" }}
-              >
-                <input
-                  type="checkbox"
-                  checked={showFmbLayer}
-                  onChange={toggleFmbLayer}
-                />
-                {String(data.Parcel_num).trim() === "137" && (
-                  <a
-                    href="/pdfs/parcel137.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: "#007bff",
-                      textDecoration: "underline",
-                      fontSize: "14px",
-                    }}
-                  >
-                    PDF
-                  </a>
-                )}
+            <>
+              <div className="record-item">
+                <div className="item-label">Adangal</div>
+                <div
+                  className="item-value"
+                  style={{ display: "flex", gap: "10px", alignItems: "center" }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showFmbLayer}
+                    onChange={toggleFmbLayer}
+                  />
+                  {String(data.Parcel_num).trim() === "137" && (
+                    <a
+                      href="/pdfs/fmb_137.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: "#007bff",
+                        textDecoration: "underline",
+                        fontSize: "14px",
+                      }}
+                    >
+                      PDF
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
+
+              <div className="record-item">
+                <div className="item-label">EC</div>
+                <div className="item-value">
+                  {String(data.Parcel_num).trim() === "137" ? (
+                    <a
+                      href="/pdfs/parcel137.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: "#007bff",
+                        textDecoration: "underline",
+                        fontSize: "14px",
+                      }}
+                    >
+                      PDF
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

@@ -228,17 +228,20 @@ export default function MapView({
         type: "line",
         source: "parcels",
         paint: { "line-color": "#003366", "line-width": 1.2 },
+        layout: { visibility: "none" },
       });
 
       map.current.addLayer({
         id: "parcels-label",
         type: "symbol",
         source: "parcels",
+
         layout: {
           "text-field": ["get", "Parcel_num"],
           "text-size": 12,
           "text-offset": [0, 0.6],
           "text-anchor": "top",
+          visibility: "none",
         },
         paint: {
           "text-color": "#111",
@@ -434,6 +437,20 @@ export default function MapView({
     if (map.current.getLayer("parcels-fill")) {
       map.current.setLayoutProperty(
         "parcels-fill",
+        "visibility",
+        cadastralVisible ? "visible" : "none"
+      );
+    }
+    if (map.current.getLayer("parcels-outline")) {
+      map.current.setLayoutProperty(
+        "parcels-outline",
+        "visibility",
+        cadastralVisible ? "visible" : "none"
+      );
+    }
+    if (map.current.getLayer("parcels-label")) {
+      map.current.setLayoutProperty(
+        "parcels-label",
         "visibility",
         cadastralVisible ? "visible" : "none"
       );
